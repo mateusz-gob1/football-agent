@@ -21,6 +21,15 @@
 
 ---
 
+## System Metrics (current state)
+
+| Metric | Value | Notes |
+|---|---|---|
+| Cost per sentiment analysis | $0.000288 | 9 articles, gemini-2.5-flash-lite |
+| Latency p50 (sentiment) | 2.40s | LangFuse dashboard |
+| Total cost (3 players, full run) | ~$0.002 | estimated |
+| ChromaDB articles stored | 9 | Mbappe only, grows each run |
+
 ## Completed Experiments
 
 ### [2026-04-07] Initial validation — sentiment_analysis, Mbappe
