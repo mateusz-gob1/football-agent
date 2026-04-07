@@ -7,6 +7,7 @@ from tools.news_fetcher import fetch_player_news
 from tools.sentiment import analyze_sentiment
 from tools.stats_fetcher import get_player_stats
 from tools.player_store import Player
+from tools.vector_store import store_articles, retrieve_context
 from agents.state import AgentState, PlayerResult
 
 load_dotenv()
@@ -27,6 +28,7 @@ def fetch_data(state: AgentState) -> AgentState:
         print(f"  Fetching data for {player.name}...")
 
         articles = fetch_player_news(player.name, club=player.club)
+        store_articles(player.name, articles)
         sentiment = analyze_sentiment(player.name, articles)
         stats = get_player_stats(player.api_football_id) if player.api_football_id else None
 
@@ -76,6 +78,8 @@ def detect_alerts(state: AgentState) -> AgentState:
 def generate_briefings(state: AgentState) -> AgentState:
     updated = []
     for r in state["results"]:
+        rag_context = retrieve_context(r["name"])
+
         prompt = f"""You are an assistant to a football agent. Write a concise weekly briefing for the following player.
 
 Player: {r['name']} ({r['club']})
@@ -85,13 +89,15 @@ STATISTICS (season 2024):
 - Appearances: {r['appearances']} | Goals: {r['goals']} | Assists: {r['assists']}
 - Average rating: {r['rating'] or 'N/A'}
 
-MEDIA COVERAGE:
+RECENT MEDIA CONTEXT:
+{rag_context}
+
+MEDIA SUMMARY:
 - Articles this week: {r['articles_count']}
 - Overall sentiment: {r['sentiment_overall'].upper()}
-{chr(10).join(f"  • [{a['sentiment']}] {a['title']}" for a in r['sentiment_details'][:5])}
 
 ALERTS:
-{chr(10).join(f"  ⚠ {alert}" for alert in r['alerts']) if r['alerts'] else "  None"}
+{chr(10).join(f"  - {alert}" for alert in r['alerts']) if r['alerts'] else "  None"}
 
 Write a briefing of 3-4 sentences covering: current form, media image, and one recommended action for the agent. Be specific and professional."""
 
