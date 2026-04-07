@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from tools.news_fetcher import fetch_player_news
 from tools.sentiment import analyze_sentiment
 from tools.stats_fetcher import get_player_stats
+from tools.transfermarkt import get_player_market_data
 from tools.player_store import Player
 from tools.vector_store import store_articles, retrieve_context
 from agents.state import AgentState, PlayerResult
@@ -31,6 +32,7 @@ def fetch_data(state: AgentState) -> AgentState:
         store_articles(player.name, articles)
         sentiment = analyze_sentiment(player.name, articles)
         stats = get_player_stats(player.api_football_id) if player.api_football_id else None
+        market = get_player_market_data(player.transfermarkt_url, player.name) if player.transfermarkt_url else None
 
         result: PlayerResult = {
             "name": player.name,
@@ -47,6 +49,9 @@ def fetch_data(state: AgentState) -> AgentState:
             "appearances": stats.appearances if stats else 0,
             "rating": stats.rating if stats else None,
             "league": stats.league if stats else "",
+            "market_value_eur": market.market_value_eur if market else None,
+            "contract_expires": market.contract_expires if market else None,
+            "days_until_expiry": market.days_until_expiry if market else None,
             "alerts": [],
             "briefing": None,
         }
@@ -69,6 +74,12 @@ def detect_alerts(state: AgentState) -> AgentState:
         if r["appearances"] > 0 and r["rating"] and r["rating"] < 7.0:
             alerts.append(f"Below-average rating: {r['rating']:.2f} in {r['league']}")
 
+        if r.get("days_until_expiry") is not None:
+            if r["days_until_expiry"] < 0:
+                alerts.append("Contract already expired")
+            elif r["days_until_expiry"] < 180:
+                alerts.append(f"Contract expiring soon: {r['contract_expires']} ({r['days_until_expiry']} days)")
+
         updated.append({**r, "alerts": alerts})
 
     return {**state, "results": updated}
@@ -80,6 +91,9 @@ def generate_briefings(state: AgentState) -> AgentState:
     for r in state["results"]:
         rag_context = retrieve_context(r["name"])
 
+        market_line = f"€{r['market_value_eur']}M" if r.get('market_value_eur') else "N/A"
+        contract_line = f"{r['contract_expires']} ({r['days_until_expiry']} days)" if r.get('contract_expires') else "N/A"
+
         prompt = f"""You are an assistant to a football agent. Write a concise weekly briefing for the following player.
 
 Player: {r['name']} ({r['club']})
@@ -88,6 +102,10 @@ STATISTICS (season 2024):
 - League: {r['league']}
 - Appearances: {r['appearances']} | Goals: {r['goals']} | Assists: {r['assists']}
 - Average rating: {r['rating'] or 'N/A'}
+
+MARKET DATA:
+- Market value: {market_line}
+- Contract expires: {contract_line}
 
 RECENT MEDIA CONTEXT:
 {rag_context}

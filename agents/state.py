@@ -15,6 +15,10 @@ class PlayerResult(TypedDict):
     appearances: int
     rating: float | None
     league: str
+    # transfermarkt
+    market_value_eur: float | None
+    contract_expires: str | None
+    days_until_expiry: int | None
     # alerts
     alerts: list[str]
     # briefing

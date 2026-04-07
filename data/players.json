@@ -3,18 +3,21 @@
     "name": "Kylian Mbappe",
     "club": "Real Madrid",
     "position": "Forward",
-    "api_football_id": 278
+    "api_football_id": 278,
+    "transfermarkt_url": "https://www.transfermarkt.com/kylian-mbappe/profil/spieler/342229"
   },
   {
     "name": "Vinicius Junior",
     "club": "Real Madrid",
     "position": "Forward",
-    "api_football_id": 762
+    "api_football_id": 762,
+    "transfermarkt_url": "https://www.transfermarkt.com/vinicius-junior/profil/spieler/371998"
   },
   {
     "name": "Pedri",
     "club": "Barcelona",
     "position": "Midfielder",
-    "api_football_id": 133609
+    "api_football_id": 133609,
+    "transfermarkt_url": "https://www.transfermarkt.com/pedri/profil/spieler/683840"
   }
 ]

@@ -12,6 +12,7 @@ class Player:
     club: str
     position: str
     api_football_id: int | None = None
+    transfermarkt_url: str | None = None
 
 
 def load_players() -> list[Player]:
