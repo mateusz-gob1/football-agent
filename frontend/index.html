@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestifute Intelligence — Football Agent Dashboard</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <div class="app" id="app">
+
+    <!-- TOP NAV -->
+    <header class="topnav">
+      <div class="topnav-left">
+        <div class="brand">
+          <div class="brand-mark">G</div>
+          <div class="brand-info">
+            <span class="brand-name">Gestifute</span>
+            <span class="brand-sub">Intelligence Platform</span>
+          </div>
+        </div>
+      </div>
+      <div class="topnav-right">
+        <div class="demo-pill">Demo Mode</div>
+        <div class="agent-chip" id="agent-chip"><!-- JS --></div>
+      </div>
+    </header>
+
+    <!-- BODY -->
+    <div class="body">
+
+      <!-- LEFT SIDEBAR -->
+      <aside class="sidebar">
+        <div class="sidebar-section-label">Portfolio</div>
+        <nav id="player-nav"><!-- JS --></nav>
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-section-label">System</div>
+        <div class="sidebar-stats" id="sidebar-stats"><!-- JS --></div>
+      </aside>
+
+      <!-- MAIN AREA -->
+      <main class="main" id="main">
+
+        <!-- OVERVIEW (default view) -->
+        <div id="view-overview">
+          <div class="page-title">
+            <h1 id="welcome-title">Good morning</h1>
+            <p id="welcome-sub">Here's what's happening with your portfolio today.</p>
+          </div>
+
+          <div class="overview-kpis" id="overview-kpis"><!-- JS --></div>
+          <div class="section-label">Players</div>
+          <div class="player-grid" id="player-grid"><!-- JS --></div>
+        </div>
+
+        <!-- PLAYER DETAIL (hidden by default) -->
+        <div id="view-player" class="hidden"><!-- JS renders here --></div>
+
+      </main>
+    </div>
+
+  </div>
+
+  <!-- DEMO MODAL -->
+  <div class="overlay hidden" id="overlay" onclick="closeModal()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-icon">⚡</div>
+      <h3>Live generation disabled</h3>
+      <p>This demo runs on pre-generated data. To use the full system with live briefing generation, clone the repository and configure your own API keys.</p>
+      <div class="modal-code">git clone https://github.com/mateusz-gob1/football-agent</div>
+      <button class="modal-close" onclick="closeModal()">Got it</button>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
