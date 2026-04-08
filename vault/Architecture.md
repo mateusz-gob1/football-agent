@@ -2,75 +2,74 @@
 
 ## System Overview
 
-Proactive intelligence layer for football agents managing player portfolios. Monitors market value, media coverage, and contract status — generates weekly briefings with actionable recommendations.
+Football Agent Intelligence System is a proactive intelligence layer for football agents managing player portfolios of 20–50 players. It replaces manual monitoring (Transfermarkt + Google News + Excel) with an automated pipeline that collects data, detects signals, and generates actionable weekly briefings per player.
 
-**Target user:** Football agent managing 20–50 players simultaneously.
+**Target user:** Football agent (e.g. Gestifute-style firm). Manages a portfolio of players. Needs to know — before it becomes urgent — about contract expiry windows, sentiment drops, and market value changes.
 
-**Core value proposition:** Existing tools (ATHLIVO, ScoutDecision) are passive — they store data but don't proactively monitor or alert. This system fills that gap with LLM-based intelligence.
+**Value vs competitors:** ATHLIVO and ScoutDecision are passive — they store and organize data. This system actively monitors, detects alerts, and generates LLM briefings with recommended actions. Neither competitor uses agentic AI or proactive alerting (verified as of 2026-04).
 
 ---
 
 ## Data Sources
 
-| Source | Data | Method |
+| Source | What it provides | Access method |
 |---|---|---|
-| NewsAPI | Articles, media coverage | REST API |
-| Transfermarkt | Market value, contract expiry | Scraping |
-| API-Football | Goals, assists, minutes, ratings | REST API |
+| NewsAPI | News articles per player (last 7 days by default) | REST API, exact-match query |
+| Transfermarkt | Market value, contract expiry, season stats per competition, value history | Web scraping (cloudscraper) |
+| API-Football | Goals, assists, minutes, match ratings | REST API, local JSON cache |
 
 ---
 
 ## LangGraph Flow
 
 ```
-[START]
-   ↓
-[load_players]
-   Load player roster from local store (name, club, position)
-   ↓
-[fetch_data]
-   For each player (parallel):
-   - NewsAPI → recent articles
-   - Transfermarkt → market value + contract date
-   - API-Football → last 10 matches stats
-   ↓
-[embed_and_store]
-   Chunk articles → embed → store in ChromaDB
-   (incremental — old articles preserved for trend analysis)
-   ↓
-[analyze_sentiment]
-   LLM classifies sentiment per article + overall per player
-   Model: gemini-2.5-flash-lite (cost-optimized)
-   ↓
-[detect_alerts]
-   Rule-based checks:
-   - Contract expiring within 6 months?
-   - Market value drop > 10%?
-   - Negative sentiment spike?
-   ↓
-[generate_briefing]
-   LLM generates per-player report with recommended actions
-   Context: RAG query from ChromaDB + structured data
-   Model: gemini-2.5-flash (quality-optimized)
-   ↓
-[human_review]
-   INTERRUPT — agent reviews and approves before any action
-   ↓
-[END]
+┌─────────────────────────────────────────────────────────┐
+│                     StateGraph                          │
+│                                                         │
+│  START                                                  │
+│    │                                                    │
+│    ▼                                                    │
+│  fetch_data                                             │
+│  (NewsAPI + TM scrape + API-Football + sentiment        │
+│   + ChromaDB store)                                     │
+│    │                                                    │
+│    ▼                                                    │
+│  detect_alerts                                          │
+│  (contract expiry, sentiment drop, no coverage,         │
+│   below-average rating)                                 │
+│    │                                                    │
+│    ▼                                                    │
+│  should_generate ──── (no alerts, no briefing req) ───► END
+│    │                                                    │
+│    │ (alerts exist OR briefing explicitly requested)    │
+│    ▼                                                    │
+│  generate_briefings                                     │
+│  (@observe LangFuse, RAG context, Gemini Flash)         │
+│    │                                                    │
+│    ▼                                                    │
+│  human_review  ◄── interrupt_before                     │
+│  (agent reviews alerts + briefings before any action)   │
+│    │                                                    │
+│    ▼                                                    │
+│   END                                                   │
+└─────────────────────────────────────────────────────────┘
 ```
+
+`should_generate` is a conditional edge function — not a node. It routes to `generate_briefings` or `END` based on state.
+
+The graph uses `interrupt_before=["human_review"]` — execution pauses before the human review node. The agent inspects briefings in the frontend, then resumes by invoking `app.invoke(None, config)`.
 
 ---
 
-## Model Routing Strategy
+## Model Routing
 
-Two models used intentionally:
-
-| Stage | Model | Reason |
+| Task | Model | Why |
 |---|---|---|
-| Sentiment classification | `gemini-2.5-flash-lite` | Simple classification, cost $0.10/$0.40 per 1M tokens |
-| Briefing generation | `gemini-2.5-flash` | Complex synthesis, higher quality needed |
+| Sentiment classification | `google/gemini-2.5-flash-lite-preview-09-2025` | Simple classification — cheap model sufficient |
+| Briefing generation | `google/gemini-2.5-flash` | Complex synthesis — quality over cost at this stage |
+| Embeddings | `sentence-transformers/all-MiniLM-L6-v2` (local) | Zero API cost, runs on CPU, no external dependency |
 
-This reduces cost per full portfolio run while maintaining output quality where it matters.
+All LLM calls route through OpenRouter. Cost and latency tracked per run via LangFuse.
 
 ---
 
@@ -78,20 +77,38 @@ This reduces cost per full portfolio run while maintaining output quality where 
 
 | Technology | Role |
 |---|---|
-| LangGraph | Agent orchestration, conditional logic, human-in-the-loop |
-| LangFuse | Observability — traces, cost tracking, latency |
-| LangChain + ChromaDB | RAG layer — article storage and retrieval |
-| RAGAS | Evaluation framework |
-| Streamlit | Demo UI |
-| Docker | Reproducible deployment |
+| LangGraph | Stateful multi-node orchestration, conditional routing, human-in-the-loop |
+| LangFuse | Observability — traces, cost per run, latency, prompt versioning |
+| LangChain | LLM abstraction, RAG pipeline |
+| ChromaDB | Vector store — article embeddings, duplicate detection |
+| sentence-transformers (all-MiniLM-L6-v2) | Local embeddings — no API cost |
+| FastAPI | Backend API serving agent runs and player data |
+| HTML/CSS/JS (vanilla) | Frontend — sidebar nav, KPI cards, player detail view, no framework |
+| cloudscraper | Cloudflare bypass for Transfermarkt scraping |
+| NewsAPI | Media monitoring |
+| Transfermarkt | Market value, contract data, season stats per competition, value history |
+| API-Football | Player match statistics (cached locally) |
+| Docker | Containerized deployment |
+| Hugging Face Spaces | Public demo hosting |
 
 ---
 
-## Key Design Decisions
+## Demo Mode
 
-See `Architecture-Decisions.md` for full rationale on each decision.
+The public demo serves pre-generated `data/demo_data.json` containing 10 Gestifute players with real scraped data. The `/api/generate` endpoint returns HTTP 403 with instructions to clone the repo and run with own API keys.
 
-1. Sentiment and briefing generation are separate nodes (testability, replaceability)
-2. RAG over full-context injection (cost at scale)
-3. ChromaDB stores incrementally — enables trend analysis across weeks
-4. Human-in-the-loop before any recommendation is acted on
+This protects API keys and scraping budget while keeping a fully functional UI visible to recruiters. The demo data was generated from a live pipeline run on 2026-04-08.
+
+Player avatars use styled initials circles with club colors (e.g. "LY" on Barcelona red for Lamine Yamal) — no external photo API, no wrong-player mismatches.
+
+---
+
+## Key Design Principles
+
+1. **LangFuse from day one.** Every LLM call is observed. Cost per run is a measurable portfolio metric.
+2. **Passive tools, active agent.** Tools (fetchers, scrapers) are stateless functions. The LangGraph graph owns all state and orchestration logic.
+3. **Separation of concerns.** Sentiment classification and briefing generation are distinct nodes with distinct models. Each is independently testable and replaceable.
+4. **RAG over full-context injection.** Articles are embedded and retrieved rather than injected wholesale. Scales to large portfolios without hitting context limits or ballooning costs.
+5. **Human-in-the-loop before action.** The agent never acts without review. LangGraph `interrupt_before` enforces this structurally.
+6. **Demo mode is a first-class concern.** Public demos must be stable and cost-free. Static pre-generated data is the correct solution, not a compromise.
+7. **Mandatory source URLs for players.** `transfermarkt_url` is required when adding a player. Prevents silent ID mismatches caused by name ambiguity.
