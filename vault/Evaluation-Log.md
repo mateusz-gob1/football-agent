@@ -55,6 +55,35 @@ Bernardo Silva contract expires in 83 days (2026-06-30) — highest urgency in p
 
 ---
 
+## Run 002 — 2026-04-09 (Demo rebuild — 20 players, real RAG)
+
+**Mode:** Live pipeline (NewsAPI + ChromaDB + dual-model briefing + critique)
+**Portfolio:** 20 Gestifute players
+**Articles processed:** 128 (real NewsAPI articles, last 14 days)
+**RAG:** ChromaDB with HuggingFace all-MiniLM-L6-v2 embeddings — articles embedded per player, top-5 retrieved per briefing
+**Briefing models:** gemini-2.5-flash + claude-sonnet-4-6 (parallel), evaluated by gemini-2.5-flash-lite
+**Alerts generated:** 3
+**Portfolio total value:** €1,181M
+
+### Briefing quality (reflection loop scores)
+
+All 20 players passed (≥7/9). Distribution:
+- 9/9: majority of players
+- 8/9: ~4 players (Mateus Fernandes Flash, Manuel Ugarte Sonnet, Francisco Conceicao both, Pedro Goncalves Flash)
+- No retries needed — 0 fails across 40 briefings
+
+**Alerts detected:**
+- Karim Adeyemi: contract expires 2027 (447 days) — near threshold
+- Manuel Ugarte: 915 minutes in 23 appearances — low playing time flag
+- Rodrigo Mora: 3 articles only — low media coverage
+
+### RAG fix
+
+Previous run had fake RAG — `rag_context` was a join of article titles, not vector retrieval.
+Fixed 2026-04-09: articles now embedded into ChromaDB via `store_articles()`, context retrieved via `retrieve_context(player_name, k=5)` similarity search. Briefing footer "RAG-enhanced" is now accurate.
+
+---
+
 ## System Metrics (historical)
 
 | Metric | Value | Notes |
@@ -63,6 +92,7 @@ Bernardo Silva contract expires in 83 days (2026-06-30) — highest urgency in p
 | Latency p50 (sentiment) | 2.40s | LangFuse dashboard |
 | Total cost (3 players, full run) | ~$0.002 | estimated |
 | Cost (10 players, 96 articles) | ~$0.006 | estimated, demo run |
+| Cost (20 players, 128 articles, dual briefing) | ~$0.024 | estimated (3× briefing stage vs single model) |
 
 ---
 

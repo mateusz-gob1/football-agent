@@ -7,4 +7,8 @@ venv/
 *.egg-info/
 .DS_Store
 data/chroma_db/
+data/capology_cache/
+data/stats_cache/
+data/history.db
+.obsidian/
 *.log
