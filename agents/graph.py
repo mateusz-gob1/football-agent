@@ -1,7 +1,11 @@
 from langgraph.graph import StateGraph, END
 from langgraph.checkpoint.memory import MemorySaver
 from agents.state import AgentState
-from agents.nodes import fetch_data, detect_alerts, generate_briefings, human_review, should_generate
+from agents.nodes import (
+    fetch_data, detect_alerts, generate_briefings,
+    critique_briefings, human_review,
+    should_generate, should_retry,
+)
 
 checkpointer = MemorySaver()
 
@@ -12,6 +16,7 @@ def build_graph():
     graph.add_node("fetch_data", fetch_data)
     graph.add_node("detect_alerts", detect_alerts)
     graph.add_node("generate_briefings", generate_briefings)
+    graph.add_node("critique_briefings", critique_briefings)
     graph.add_node("human_review", human_review)
 
     graph.set_entry_point("fetch_data")
@@ -22,7 +27,12 @@ def build_graph():
         should_generate,
         {"generate": "generate_briefings", "end": END},
     )
-    graph.add_edge("generate_briefings", "human_review")
+    graph.add_edge("generate_briefings", "critique_briefings")
+    graph.add_conditional_edges(
+        "critique_briefings",
+        should_retry,
+        {"generate_briefings": "generate_briefings", "human_review": "human_review"},
+    )
     graph.add_edge("human_review", END)
 
     return graph.compile(checkpointer=checkpointer, interrupt_before=["human_review"])
@@ -40,7 +50,7 @@ if __name__ == "__main__":
     print(f"Processing {len(players)} player(s): {', '.join(p['name'] for p in players)}\n")
 
     # Run until interrupt
-    state = app.invoke({"players": players, "results": [], "pending_briefings": [], "human_approved": False}, config=config)
+    state = app.invoke({"players": players, "results": [], "pending_briefings": [], "briefing_attempts": 0, "human_approved": False}, config=config)
 
     # Show briefings and ask for approval
     print("\nBriefings ready. Type 'approve' to confirm or 'reject' to cancel: ", end="")

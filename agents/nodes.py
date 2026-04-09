@@ -9,6 +9,7 @@ from tools.stats_fetcher import get_player_stats
 from tools.transfermarkt import get_player_market_data
 from tools.player_store import Player
 from tools.vector_store import store_articles, retrieve_context
+from tools.history_store import save_snapshot, get_snapshots
 from agents.state import AgentState, PlayerResult
 
 load_dotenv()
@@ -18,7 +19,10 @@ client = OpenAI(
     base_url=os.getenv("OPENROUTER_BASE_URL"),
 )
 MODEL = os.getenv("DEFAULT_MODEL", "google/gemini-2.5-flash-lite-preview-09-2025")
-BRIEFING_MODEL = "google/gemini-2.5-flash"
+BRIEFING_MODEL_FLASH  = "google/gemini-2.5-flash"
+BRIEFING_MODEL_SONNET = "anthropic/claude-sonnet-4-6"
+CRITIQUE_MODEL        = "google/gemini-2.5-flash-lite-preview-09-2025"
+MAX_REFLECTION_ATTEMPTS = 2
 
 
 @observe(name="fetch_data")
@@ -34,6 +38,14 @@ def fetch_data(state: AgentState) -> AgentState:
         stats = get_player_stats(player.api_football_id) if player.api_football_id else None
         market = get_player_market_data(player.transfermarkt_url, player.name) if player.transfermarkt_url else None
 
+        if market:
+            save_snapshot(
+                player.name,
+                market.market_value_eur,
+                market.contract_expires,
+                market.days_until_expiry,
+            )
+
         result: PlayerResult = {
             "name": player.name,
             "club": player.club,
@@ -41,7 +53,7 @@ def fetch_data(state: AgentState) -> AgentState:
             "articles_count": len(articles),
             "sentiment_overall": sentiment.overall,
             "sentiment_details": [
-                {"title": a.title, "sentiment": a.sentiment, "reason": a.reason}
+                {"title": a.title, "url": a.url, "sentiment": a.sentiment, "reason": a.reason}
                 for a in sentiment.articles
             ],
             "goals": stats.goals if stats else 0,
@@ -52,6 +64,7 @@ def fetch_data(state: AgentState) -> AgentState:
             "market_value_eur": market.market_value_eur if market else None,
             "contract_expires": market.contract_expires if market else None,
             "days_until_expiry": market.days_until_expiry if market else None,
+            "value_history": get_snapshots(player.name),
             "alerts": [],
             "briefing": None,
         }
@@ -85,62 +98,235 @@ def detect_alerts(state: AgentState) -> AgentState:
     return {**state, "results": updated}
 
 
-@observe(name="generate_briefings")
-def generate_briefings(state: AgentState) -> AgentState:
-    updated = []
-    for r in state["results"]:
-        rag_context = retrieve_context(r["name"])
+def _build_briefing_prompt(r: dict, rag_context: str, critique_feedback: str | None = None) -> str:
+    market_line   = f"€{r['market_value_eur']}M" if r.get("market_value_eur") else "N/A"
+    contract_line = f"{r['contract_expires']} ({r['days_until_expiry']} days)" if r.get("contract_expires") else "N/A"
+    alerts_text   = "\n".join(f"  - {a}" for a in r["alerts"]) if r["alerts"] else "  None"
 
-        market_line = f"€{r['market_value_eur']}M" if r.get('market_value_eur') else "N/A"
-        contract_line = f"{r['contract_expires']} ({r['days_until_expiry']} days)" if r.get('contract_expires') else "N/A"
+    # Build article sources list with URLs
+    sources_text = ""
+    for art in (r.get("sentiment_details") or []):
+        url_part = f" — {art['url']}" if art.get("url") else ""
+        sources_text += f"  [{art['sentiment'].upper()}] {art['title']}{url_part}\n"
+    if not sources_text:
+        sources_text = "  No articles this week\n"
 
-        prompt = f"""You are an assistant to a football agent. Write a concise weekly briefing for the following player.
+    feedback_section = ""
+    if critique_feedback:
+        feedback_section = f"""
+PREVIOUS ATTEMPT FEEDBACK (improve on this):
+{critique_feedback}
+"""
+
+    return f"""You are an intelligence analyst assisting a professional football agent. Write a detailed weekly intelligence brief for the following player.
 
 Player: {r['name']} ({r['club']})
 
-STATISTICS (season 2024):
+PLAYER PROFILE:
+- Age: {r.get('age', 'N/A')} years old
+
+SEASON STATISTICS (25/26):
 - League: {r['league']}
-- Appearances: {r['appearances']} | Goals: {r['goals']} | Assists: {r['assists']}
-- Average rating: {r['rating'] or 'N/A'}
+- Appearances: {r['appearances']} | Goals: {r['goals']} | Assists: {r['assists']} | Minutes: {r.get('minutes', 'N/A')}'
 
 MARKET DATA:
-- Market value: {market_line}
+- Current market value: {market_line}
 - Contract expires: {contract_line}
 
-RECENT MEDIA CONTEXT:
+RECENT MEDIA CONTEXT (RAG retrieval):
 {rag_context}
 
-MEDIA SUMMARY:
-- Articles this week: {r['articles_count']}
-- Overall sentiment: {r['sentiment_overall'].upper()}
+MEDIA ARTICLES THIS WEEK ({r['articles_count']} total, overall sentiment: {r['sentiment_overall'].upper()}):
+{sources_text}
+ACTIVE ALERTS:
+{alerts_text}
+{feedback_section}
+Output the brief with NO title, NO header, NO player name, NO date line, NO classification label, NO preamble of any kind. Start the response immediately with the bold section header **FORM & PERFORMANCE** and nothing before it.
 
-ALERTS:
-{chr(10).join(f"  - {alert}" for alert in r['alerts']) if r['alerts'] else "  None"}
+Use EXACTLY this four-section format every time:
 
-Write a briefing of 3-4 sentences covering: current form, media image, and one recommended action for the agent. Be specific and professional."""
+**FORM & PERFORMANCE**
+[2-3 sentences on current form with specific numbers — appearances, goals, assists, rating if available.]
 
-        response = client.chat.completions.create(
-            model=BRIEFING_MODEL,
-            messages=[{"role": "user", "content": prompt}],
+**MEDIA INTELLIGENCE**
+[2-3 sentences on key narratives from the articles listed above. Reference specific article titles. Flag any negative or risk coverage.]
+
+**MARKET & CONTRACT**
+[2-3 sentences on market value (€XM), contract expiry date, transfer window implications. Reference actual figures.]
+
+**RECOMMENDED ACTIONS**
+1. [Most urgent action — name a specific person, club, or hard deadline]
+2. [Second priority]
+3. [Third if relevant, else omit]
+
+Rules:
+- No markdown headers (#, ##), no horizontal rules (---), no metadata lines
+- Reference actual numbers and dates from the data above — no generic statements
+- If there are active alerts, at least one action must directly address them
+- Tone: direct, professional, written for a sports agent"""
+
+
+@observe(name="generate_briefings")
+def generate_briefings(state: AgentState) -> AgentState:
+    attempt = state.get("briefing_attempts", 0)
+    updated = []
+
+    for r in state["results"]:
+        rag_context = retrieve_context(r["name"])
+
+        # On retry: extract previous feedback for this player from reflection results
+        prev_feedback = None
+        if attempt > 0 and r.get("reflection"):
+            ref = r["reflection"]
+            # Use feedback from whichever model scored lower, or combine both
+            feedbacks = []
+            if not ref.get("flash_passed"):
+                feedbacks.append(f"Flash: {ref.get('flash_feedback', '')}")
+            if not ref.get("sonnet_passed"):
+                feedbacks.append(f"Sonnet: {ref.get('sonnet_feedback', '')}")
+            if feedbacks:
+                prev_feedback = " | ".join(feedbacks)
+
+        prompt = _build_briefing_prompt(r, rag_context, prev_feedback)
+        messages = [{"role": "user", "content": prompt}]
+
+        # Generate with both models
+        resp_flash = client.chat.completions.create(
+            model=BRIEFING_MODEL_FLASH,
+            messages=messages,
             temperature=0.3,
-            max_tokens=300,
+            max_tokens=700,
         )
-        briefing = response.choices[0].message.content.strip()
-        updated.append({**r, "briefing": briefing})
+        resp_sonnet = client.chat.completions.create(
+            model=BRIEFING_MODEL_SONNET,
+            messages=messages,
+            temperature=0.3,
+            max_tokens=700,
+        )
 
+        briefing_flash  = resp_flash.choices[0].message.content.strip()
+        briefing_sonnet = resp_sonnet.choices[0].message.content.strip()
+
+        updated.append({
+            **r,
+            "briefing_flash":  briefing_flash,
+            "briefing_sonnet": briefing_sonnet,
+            "briefing":        briefing_sonnet,   # default to sonnet; overridden by critique
+            "reflection":      None,              # will be filled by critique_briefings
+        })
+
+    return {**state, "results": updated, "briefing_attempts": attempt + 1}
+
+
+@observe(name="critique_briefings")
+def critique_briefings(state: AgentState) -> AgentState:
+    """
+    Evaluate both briefings per player using a lightweight model.
+    Scores on three criteria (1-3 each):
+      1. ACTIONABLE — specific recommended action for the agent
+      2. GROUNDED   — references actual data (value, contract date, stats)
+      3. ALERT-AWARE — addresses active alerts (if any)
+    Pass threshold: total >= 7 out of 9.
+    """
+    import json as _json
+
+    updated = []
+    for r in state["results"]:
+        alerts_text = ", ".join(r["alerts"]) if r["alerts"] else "none"
+
+        def _critique(briefing_text: str) -> dict:
+            prompt = f"""Score this football agent briefing on three criteria (1-3 each).
+
+Player alerts: {alerts_text}
+
+Briefing:
+{briefing_text}
+
+Criteria:
+1. ACTIONABLE (1-3): Contains a specific recommended action tied to this player's situation?
+2. GROUNDED (1-3): References specific numbers/dates from the data (not generic statements)?
+3. ALERT-AWARE (1-3): Addresses active alerts if any exist (score 3 if no alerts)?
+
+Respond with JSON only, no explanation:
+{{"score": <sum 3-9>, "passed": <true if score >= 7>, "feedback": "<one sentence on biggest weakness>"}}"""
+
+            resp = client.chat.completions.create(
+                model=CRITIQUE_MODEL,
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.0,
+                max_tokens=100,
+            )
+            raw = resp.choices[0].message.content.strip()
+            try:
+                # Strip markdown code fences if present
+                raw = raw.strip("`").removeprefix("json").strip()
+                return _json.loads(raw)
+            except Exception:
+                return {"score": 5, "passed": False, "feedback": "Could not parse critique response."}
+
+        flash_result  = _critique(r.get("briefing_flash", ""))
+        sonnet_result = _critique(r.get("briefing_sonnet", ""))
+
+        reflection = {
+            "flash_score":    flash_result.get("score", 0),
+            "flash_passed":   flash_result.get("passed", False),
+            "flash_feedback": flash_result.get("feedback", ""),
+            "sonnet_score":   sonnet_result.get("score", 0),
+            "sonnet_passed":  sonnet_result.get("passed", False),
+            "sonnet_feedback": sonnet_result.get("feedback", ""),
+        }
+
+        # Select best briefing as the primary
+        if sonnet_result.get("passed"):
+            best = r.get("briefing_sonnet", "")
+        elif flash_result.get("passed"):
+            best = r.get("briefing_flash", "")
+        else:
+            # Neither passed — pick higher score
+            best = (
+                r.get("briefing_sonnet", "")
+                if sonnet_result.get("score", 0) >= flash_result.get("score", 0)
+                else r.get("briefing_flash", "")
+            )
+
+        updated.append({**r, "reflection": reflection, "briefing": best})
+
+    # Build pending_briefings for human_review display
     pending = []
     for r in updated:
+        ref = r.get("reflection") or {}
         text = f"""
 {'='*60}
 PLAYER: {r['name']} ({r['club']})
 {'='*60}
-{r['briefing']}
+[Gemini Flash  score {ref.get('flash_score', '?')}/9{' PASS' if ref.get('flash_passed') else ' FAIL'}]
+{r.get('briefing_flash', 'N/A')}
 
+[Claude Sonnet  score {ref.get('sonnet_score', '?')}/9{' PASS' if ref.get('sonnet_passed') else ' FAIL'}]
+{r.get('briefing_sonnet', 'N/A')}
+
+SELECTED: {'Claude Sonnet' if r.get('briefing') == r.get('briefing_sonnet') else 'Gemini Flash'}
 Alerts: {', '.join(r['alerts']) if r['alerts'] else 'None'}
 {'='*60}"""
         pending.append(text)
 
     return {**state, "results": updated, "pending_briefings": pending}
+
+
+def should_retry(state: AgentState) -> str:
+    """
+    Conditional edge after critique_briefings.
+    Retry generation if any player failed both models AND we haven't hit the attempt limit.
+    """
+    if state.get("briefing_attempts", 0) >= MAX_REFLECTION_ATTEMPTS:
+        return "human_review"
+
+    for r in state["results"]:
+        ref = r.get("reflection", {}) or {}
+        if not ref.get("flash_passed") and not ref.get("sonnet_passed"):
+            return "generate_briefings"
+
+    return "human_review"
 
 
 def human_review(state: AgentState) -> AgentState:

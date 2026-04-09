@@ -19,6 +19,7 @@ MODEL = os.getenv("DEFAULT_MODEL", "google/gemini-2.5-flash-lite-preview-09-2025
 @dataclass
 class ArticleSentiment:
     title: str
+    url: str
     sentiment: str  # positive | negative | neutral
     reason: str
 
@@ -43,7 +44,7 @@ def analyze_sentiment(player_name: str, articles: list[Article]) -> PlayerSentim
 
     articles_text = ""
     for i, a in enumerate(articles, 1):
-        articles_text += f"{i}. Title: {a.title}\n   Description: {a.description}\n\n"
+        articles_text += f"{i}. Title: {a.title}\n   URL: {a.url}\n   Description: {a.description}\n\n"
 
     prompt = f"""Analyze the media sentiment for football player {player_name} based on these articles.
 
@@ -54,6 +55,7 @@ Return a JSON object with this exact structure:
   "articles": [
     {{
       "title": "article title",
+      "url": "article url",
       "sentiment": "positive" | "negative" | "neutral",
       "reason": "one sentence explaining why"
     }}
@@ -74,9 +76,13 @@ Rules:
 
     raw = json.loads(response.choices[0].message.content)
 
+    # Build a url lookup from original articles so we can fill in missing urls
+    url_by_title = {a.title: a.url for a in articles}
+
     article_sentiments = [
         ArticleSentiment(
             title=item["title"],
+            url=item.get("url") or url_by_title.get(item["title"], ""),
             sentiment=item["sentiment"],
             reason=item["reason"],
         )

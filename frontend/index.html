@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gestifute Intelligence — Football Agent Dashboard</title>
   <link rel="stylesheet" href="/static/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
 </head>
@@ -52,6 +53,19 @@
           </div>
 
           <div class="overview-kpis" id="overview-kpis"><!-- JS --></div>
+
+          <div class="section-label">Portfolio Analytics</div>
+          <div class="charts-row">
+            <div class="module chart-module">
+              <div class="module-title">Market Value Comparison</div>
+              <div class="chart-wrap"><canvas id="chart-portfolio"></canvas></div>
+            </div>
+            <div class="module chart-module">
+              <div class="module-title">Media Sentiment Distribution</div>
+              <div class="chart-wrap chart-wrap--donut"><canvas id="chart-sentiment"></canvas></div>
+            </div>
+          </div>
+
           <div class="section-label">Players</div>
           <div class="player-grid" id="player-grid"><!-- JS --></div>
         </div>

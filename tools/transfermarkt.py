@@ -1,15 +1,24 @@
 import json
 import re
 import time
-import cloudscraper
 from dataclasses import dataclass, field
 from bs4 import BeautifulSoup
 from datetime import date
+from playwright.sync_api import sync_playwright, Browser, Playwright
 
-# cloudscraper handles Cloudflare JS-challenge that plain requests can't pass
-_scraper = cloudscraper.create_scraper(
-    browser={"browser": "chrome", "platform": "windows", "mobile": False}
-)
+# Module-level browser — initialized once, reused across all requests in a pipeline run.
+# This avoids the overhead of launching Chromium for every page fetch.
+_pw: Playwright | None = None
+_browser: Browser | None = None
+
+
+def _get_browser() -> Browser:
+    global _pw, _browser
+    if _browser is None or not _browser.is_connected():
+        if _pw is None:
+            _pw = sync_playwright().start()
+        _browser = _pw.chromium.launch(headless=True)
+    return _browser
 
 
 @dataclass
@@ -82,9 +91,22 @@ def _url_variant(profile_url: str, section: str) -> str:
 
 def _fetch(url: str) -> BeautifulSoup:
     time.sleep(2)
-    r = _scraper.get(url, timeout=20)
-    r.raise_for_status()
-    return BeautifulSoup(r.text, "html.parser")
+    browser = _get_browser()
+    ctx = browser.new_context(
+        user_agent=(
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/124.0.0.0 Safari/537.36"
+        ),
+        locale="en-US",
+        viewport={"width": 1280, "height": 800},
+        extra_http_headers={"Accept-Language": "en-US,en;q=0.9"},
+    )
+    page = ctx.new_page()
+    page.goto(url, wait_until="networkidle", timeout=30_000)
+    html = page.content()
+    ctx.close()
+    return BeautifulSoup(html, "html.parser")
 
 
 # ── public functions ────────────────────────────────────────────────────────

@@ -33,7 +33,7 @@
 
 **Method:** Web scraping — no official API exists.
 
-**Library:** cloudscraper (handles Cloudflare JS challenges)
+**Library:** Playwright (Chromium, headless) — migrated from cloudscraper on 2026-04-09.
 
 ### Functions
 
@@ -55,18 +55,19 @@ The `{id}` is the numeric Transfermarkt player ID. This must be copied from the 
 
 ### Cloudflare Bypass
 
-cloudscraper handles standard Cloudflare JS challenges automatically. No configuration needed for most pages.
+Playwright with Chromium (headless) launches a real browser for each fetch. Shares a module-level browser instance across all requests in a pipeline run (one launch, many contexts). Each request gets a fresh browser context (isolated cookies/headers).
 
-**Known limitation:** Cloudflare Turnstile (returns HTTP 405) requires real browser execution. cloudscraper cannot solve it. When this occurs, the scrape fails for that page.
+**Configuration:** Chrome UA, `locale=en-US`, `viewport=1280×800`, `wait_until="networkidle"` — gives Cloudflare time to resolve the challenge before the HTML is captured.
 
-**Mitigation:** Accept occasional failures. The system is designed for weekly runs — a missed scrape is retried the following week. Future fix: migrate to Playwright for full browser automation.
+**Known limitation:** Cloudflare Turnstile ("Let's confirm you are human") still blocks headless Playwright during testing. This affects `leistungsdaten` and `marktwertverlauf` pages but not always `profil`. Contract data for the demo is sourced from Capology as fallback.
+
+**Setup:** After `pip install playwright`, run `playwright install chromium` once.
 
 ### Rate Limiting
 
-Findings from testing:
-- ~10 rapid requests trigger a Cloudflare block
-- Production cadence: 10–12 players/week with 2-second delays between requests — does not trigger the block
-- The schnellsuche (search) endpoint is also rate-limited — do not use for ID resolution at scale
+- 2-second sleep between requests (in `_fetch()`)
+- Production cadence (weekly, ~10 players) is safe
+- Aggressive scraping (30+ rapid requests) will trigger Cloudflare blocking
 
 ### Player ID Verification
 
@@ -89,6 +90,8 @@ Planned as next-step improvement. Full browser execution via Playwright will:
 
 **Purpose:** Player match statistics — goals, assists, minutes, average rating.
 
+**Current usage note:** Free tier covers seasons 2022–2024 only. Season 2025/26 stats for the demo are sourced from Transfermarkt screenshots (manual entry). API-Football is used for historical cache only.
+
 **Base URL:** `https://v3.football.api-sports.io`
 
 **Key endpoints:**
@@ -103,6 +106,62 @@ Planned as next-step improvement. Full browser execution via Playwright will:
 
 **Player ID resolution:** `add_player()` in `tools/player_store.py` auto-resolves the API-Football ID from player name + club at registration time.
 
-**Note:** As of Block 2, Transfermarkt's `get_season_stats()` also provides season stats per competition. API-Football remains in use for match rating data, which TM does not provide.
+**Note:** API-Football is the primary stats source. FBref (via `soccerdata`) is a secondary/fallback source added in Block 3 for richer data (xG, xAG) and seasons where API-Football cache is stale.
+
+**See also:** `tools/fbref_fetcher.py`
 
 **Registration:** api-sports.io — free account, no credit card required.
+
+---
+
+## FBref (via soccerdata)
+
+**Purpose:** Secondary/fallback source for player season statistics. Richer than API-Football — includes xG, xAG, progressive carries, pressing stats.
+
+**Method:** `soccerdata` Python library scrapes fbref.com and caches HTML locally in `~/soccerdata/data/FBref/`.
+
+**Entry point:** `get_player_stats(player_name, club, season)` in `tools/fbref_fetcher.py`
+
+**When used:**
+- API-Football player ID not found
+- Richer stats needed for briefing context (xG, advanced metrics)
+- RAGAS evaluation pipeline (controlled dataset)
+
+**Supported leagues:** ENG-Premier League, ESP-La Liga, FRA-Ligue 1, ITA-Serie A, GER-Bundesliga
+
+**Rate limit:** ~7 seconds between requests (enforced automatically by soccerdata). First call per league/season takes 10–30s; subsequent calls use local cache and are instant.
+
+**Returns:** appearances (MP), goals (Gls), assists (Ast), minutes (Min), xG, xAG
+
+**Key constraint:** League-level query only — returns all players in a league, filtered by name. Not player-centric like API-Football.
+
+**Installation:** `pip install soccerdata`
+
+---
+
+## Capology
+
+**Purpose:** Player salary estimates and contract expiry dates. Only public source for football wages.
+
+**Method:** Playwright scraper (Chromium) — same browser infrastructure as Transfermarkt scraper. ScraperFC's Capology module was available but uses Selenium; we use Playwright for consistency.
+
+**Entry point:** `get_player_contract(player_name, club, season)` in `tools/capology_fetcher.py`
+
+**Returns per player:**
+- `weekly_eur` — estimated gross weekly salary in EUR
+- `annual_eur` — estimated gross annual salary in EUR
+- `contract_signed` — ISO date the current contract was signed
+- `contract_expires` — ISO date contract ends
+- `years_remaining` — full seasons left
+
+**Caching:** Full league scrape cached in `data/capology_cache/{league}_{season}.json`. Re-fetch not needed within the same season unless a transfer occurs.
+
+**Supported leagues:** ENG-Premier League, ESP-La Liga, FRA-Ligue 1, ITA-Serie A, GER-Bundesliga, POR-Primeira Liga, SAU-Saudi Pro League
+
+**Salary accuracy:** Capology labels all figures as estimates. Actual contract values including bonuses and image rights are not public.
+
+**Verified data (2025-26 season, tested 2026-04-09):**
+- Bernardo Silva (Man City): €300k/week, expires 2026-06-30 ✅ (matches TM data)
+- Lamine Yamal (Barcelona): €320k/week, expires 2031-06-30
+- Vitinha (PSG): €227k/week, expires 2029-06-30
+- Cristiano Ronaldo (Al-Nassr): Saudi Pro League covered ✅
