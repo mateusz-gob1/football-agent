@@ -13,6 +13,7 @@ load_dotenv()
 from langfuse.openai import OpenAI
 from tools.news_fetcher import fetch_player_news
 from tools.sentiment import analyze_sentiment
+from tools.vector_store import store_articles, retrieve_context
 from agents.nodes import _build_briefing_prompt
 
 client = OpenAI(
@@ -159,9 +160,14 @@ for base in PORTFOLIO:
         "rating": None,
     }
 
+    # Store articles in ChromaDB and retrieve RAG context
+    if articles:
+        added = store_articles(base["name"], articles)
+        print(f"  Stored {added} new articles in ChromaDB")
+    rag_context = retrieve_context(base["name"], k=5)
+
     # Generate briefings
     print(f"  Generating briefings...")
-    rag_context = " | ".join(a.title for a in articles[:4]) if articles else "No recent coverage."
     prompt = _build_briefing_prompt(player, rag_context)
     messages = [{"role":"user","content":prompt}]
 
