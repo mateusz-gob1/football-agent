@@ -74,82 +74,11 @@ def fetch_data(state: AgentState) -> AgentState:
     return {**state, "results": results}
 
 
-SIGNAL_LABELS = {
-    "transfer_rumor":       "Transfer rumor",
-    "injury":               "Injury concern",
-    "dispute":              "Internal dispute",
-    "contract_negotiation": "Contract talks",
-    "off_field_issue":      "Off-field issue",
-}
-
-
-@observe(name="detect_signals")
-def detect_signals(state: AgentState) -> AgentState:
-    """LLM-powered signal detection — reads article headlines and flags non-obvious intelligence signals."""
-    updated = []
-    for r in state["results"]:
-        articles = r.get("sentiment_details") or []
-        if not articles:
-            updated.append(r)
-            continue
-
-        headlines = "\n".join(f"- {a['title']}" for a in articles if a.get("title"))
-
-        prompt = f"""You analyze media coverage of football player {r['name']} ({r['club']}).
-
-Headlines this week:
-{headlines}
-
-Identify signals that a football agent would want to know about:
-- transfer_rumor: player linked to a move to another club
-- injury: player injured, ill, or struggling physically
-- dispute: conflict with manager, club, or teammates
-- contract_negotiation: contract renewal or talks mentioned
-- off_field_issue: disciplinary problem, scandal, or controversy
-
-Return a JSON array. Only include signals clearly supported by the headlines.
-For each signal: {{"signal": "...", "confidence": "high|medium", "evidence": "one sentence, max 12 words"}}
-If no signals found return: []
-JSON only, no markdown."""
-
-        try:
-            response = client.chat.completions.create(
-                model=MODEL,
-                messages=[{"role": "user", "content": prompt}],
-                temperature=0,
-            )
-            content = response.choices[0].message.content or "[]"
-            if "```" in content:
-                content = content.split("```")[1]
-                if content.startswith("json"):
-                    content = content[4:]
-                content = content.strip()
-            signals = json.loads(content)
-            if not isinstance(signals, list):
-                signals = []
-        except Exception:
-            signals = []
-
-        new_alerts = list(r.get("alerts") or [])
-        for s in signals:
-            if not isinstance(s, dict):
-                continue
-            label = SIGNAL_LABELS.get(s.get("signal", ""), s.get("signal", "Signal"))
-            evidence = s.get("evidence", "")
-            confidence = s.get("confidence", "medium")
-            prefix = "[!]" if confidence == "high" else "[?]"
-            new_alerts.append(f"{prefix} {label} — {evidence}")
-
-        updated.append({**r, "alerts": new_alerts})
-
-    return {**state, "results": updated}
-
-
 def detect_alerts(state: AgentState) -> AgentState:
-    """Rule-based alert detection — appends to alerts already set by detect_signals."""
+    """Rule-based alert detection."""
     updated = []
     for r in state["results"]:
-        alerts = list(r.get("alerts") or [])  # preserve LLM signals from previous node
+        alerts = []
 
         if r["sentiment_overall"] == "negative":
             alerts.append(f"Negative media sentiment — {r['articles_count']} articles this week")

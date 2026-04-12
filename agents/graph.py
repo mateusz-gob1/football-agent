@@ -2,7 +2,7 @@ from langgraph.graph import StateGraph, END
 from langgraph.checkpoint.memory import MemorySaver
 from agents.state import AgentState
 from agents.nodes import (
-    fetch_data, detect_signals, detect_alerts, generate_briefings,
+    fetch_data, detect_alerts, generate_briefings,
     critique_briefings,
     should_generate, should_retry,
 )
@@ -14,15 +14,13 @@ def build_graph():
     graph = StateGraph(AgentState)
 
     graph.add_node("fetch_data", fetch_data)
-    graph.add_node("detect_signals", detect_signals)
     graph.add_node("detect_alerts", detect_alerts)
     graph.add_node("generate_briefings", generate_briefings)
     graph.add_node("critique_briefings", critique_briefings)
 
     graph.set_entry_point("fetch_data")
 
-    graph.add_edge("fetch_data", "detect_signals")
-    graph.add_edge("detect_signals", "detect_alerts")
+    graph.add_edge("fetch_data", "detect_alerts")
     graph.add_conditional_edges(
         "detect_alerts",
         should_generate,

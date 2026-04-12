@@ -7,6 +7,11 @@ import os, sys, json
 from pathlib import Path
 from datetime import date
 sys.path.insert(0, str(Path(__file__).parent.parent))
+
+# Fix Windows console encoding for non-ASCII characters in article titles
+if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
 from dotenv import load_dotenv
 load_dotenv()
 
