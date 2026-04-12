@@ -329,13 +329,6 @@ def should_retry(state: AgentState) -> str:
     return "human_review"
 
 
-def human_review(state: AgentState) -> AgentState:
-    # LangGraph will interrupt here — execution pauses until resumed
-    print("\n" + "\n".join(state["pending_briefings"]))
-    print("\n[WAITING FOR AGENT APPROVAL]")
-    return state
-
-
 def should_generate(state: AgentState) -> str:
     """Conditional edge: skip briefing generation if no results."""
     if not state.get("results"):

@@ -3,7 +3,7 @@
 ## Run 001 — 2026-04-08 (Demo)
 
 **Mode:** Demo (pre-generated data, no live LLM calls)
-**Portfolio:** 10 Gestifute players
+**Portfolio:** 10 Football Agent Assistant players
 **Articles processed:** 96 (estimated)
 **Run cost (live pipeline estimate):** ~$0.006
 **Alerts generated:** 5
@@ -58,7 +58,7 @@ Bernardo Silva contract expires in 83 days (2026-06-30) — highest urgency in p
 ## Run 002 — 2026-04-09 (Demo rebuild — 20 players, real RAG)
 
 **Mode:** Live pipeline (NewsAPI + ChromaDB + dual-model briefing + critique)
-**Portfolio:** 20 Gestifute players
+**Portfolio:** 20 Football Agent Assistant players
 **Articles processed:** 128 (real NewsAPI articles, last 14 days)
 **RAG:** ChromaDB with HuggingFace all-MiniLM-L6-v2 embeddings — articles embedded per player, top-5 retrieved per briefing
 **Briefing models:** gemini-2.5-flash + claude-sonnet-4-6 (parallel), evaluated by gemini-2.5-flash-lite
@@ -84,6 +84,51 @@ Fixed 2026-04-09: articles now embedded into ChromaDB via `store_articles()`, co
 
 ---
 
+## Run 003 — 2026-04-12 (Sentiment model comparison — LLM-as-judge)
+
+**Mode:** LLM-as-judge evaluation
+**Judge:** claude-sonnet-4-6 (independent classification → ground truth)
+**Sample:** 36 articles across 6 players (Lamine Yamal, Ruben Dias, Pedro Neto, Joao Neves, Bradley Barcola, Vitinha)
+
+| Model | Agreement | Matches |
+|---|---|---|
+| claude-haiku-4-5 | **100.0%** | 36/36 |
+| gemini-2.5-flash | 97.2% | 35/36 |
+| gemini-2.5-flash-lite | 97.2% | 35/36 |
+| gpt-4o-mini | 97.2% | 35/36 |
+
+**Decision:** keep `gemini-2.5-flash-lite` as sentiment model — 97.2% accuracy at lowest cost.
+
+---
+
+## Run 004 — 2026-04-12 (RAGAS evaluation — RAG pipeline quality)
+
+**Mode:** RAGAS evaluation (reference-free metrics)
+**Judge LLM:** google/gemini-2.5-flash
+**Embeddings:** sentence-transformers/all-MiniLM-L6-v2 (local)
+**Context:** ChromaDB top-5 article chunks + structured data (stats, market value, contract, sentiment) per player
+**Sample:** 5 players
+
+| Player | Faithfulness | Answer Relevancy |
+|---|---|---|
+| Lamine Yamal | 0.800 | 0.743 |
+| Ruben Dias | 0.455 | 0.690 |
+| Pedro Neto | 0.490 | 0.770 |
+| Joao Neves | 0.792 | 0.747 |
+| Bradley Barcola | 0.667 | 0.596 |
+| **MEAN** | **0.641** | **0.709** |
+
+**Context design:** `retrieved_contexts` = article chunks (ChromaDB) + structured strings for stats, market value, contract, alerts. This covers all data sources that feed the briefing prompt — giving faithfulness a fair basis for verification.
+
+**Interpretation:**
+- `faithfulness` 0.641 — most briefing claims are grounded in the combined context; remaining gap reflects model's general football knowledge used to frame data
+- `answer_relevancy` 0.709 — briefings consistently address the monitoring query
+- First run (articles only) gave faithfulness 0.323 — demonstrates that hybrid context is the correct evaluation setup for this system
+
+**Note:** `context_precision` excluded — requires ground truth reference. Would require manual annotation of ideal chunk ranking per player.
+
+---
+
 ## System Metrics (historical)
 
 | Metric | Value | Notes |
@@ -93,6 +138,9 @@ Fixed 2026-04-09: articles now embedded into ChromaDB via `store_articles()`, co
 | Total cost (3 players, full run) | ~$0.002 | estimated |
 | Cost (10 players, 96 articles) | ~$0.006 | estimated, demo run |
 | Cost (20 players, 128 articles, dual briefing) | ~$0.024 | estimated (3× briefing stage vs single model) |
+| Sentiment accuracy (LLM-as-judge, 36 articles) | 97.2% | gemini-2.5-flash-lite vs claude-sonnet-4-6 judge |
+| RAG faithfulness (RAGAS, 5 players) | 0.323 | briefings extend beyond articles — by design |
+| RAG answer relevancy (RAGAS, 5 players) | 0.707 | briefings address monitoring query |
 
 ---
 

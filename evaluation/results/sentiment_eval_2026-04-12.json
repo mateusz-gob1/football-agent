@@ -1,0 +1,691 @@
+{
+  "date": "2026-04-12",
+  "judge_model": "anthropic/claude-sonnet-4-6",
+  "candidate_models": [
+    "google/gemini-2.5-flash-lite-preview-09-2025",
+    "google/gemini-2.5-flash",
+    "anthropic/claude-haiku-4-5",
+    "openai/gpt-4o-mini"
+  ],
+  "sample_players": [
+    "Lamine Yamal",
+    "Ruben Dias",
+    "Pedro Neto",
+    "Joao Neves",
+    "Bradley Barcola",
+    "Vitinha"
+  ],
+  "total_articles": 36,
+  "model_results": {
+    "google/gemini-2.5-flash-lite-preview-09-2025": {
+      "agreement_rate": 0.972,
+      "matches": 35,
+      "total": 36
+    },
+    "google/gemini-2.5-flash": {
+      "agreement_rate": 0.972,
+      "matches": 35,
+      "total": 36
+    },
+    "anthropic/claude-haiku-4-5": {
+      "agreement_rate": 1.0,
+      "matches": 36,
+      "total": 36
+    },
+    "openai/gpt-4o-mini": {
+      "agreement_rate": 0.972,
+      "matches": 35,
+      "total": 36
+    }
+  },
+  "article_evals": [
+    {
+      "player": "Lamine Yamal",
+      "title": "Record – Lamine Yamal goes past Real Madrid legend to become youngest player to 100 La Liga appearances",
+      "description": "FC Barcelona sensation Lamine Yamal started in the derby against Espanyol today at the Spotify Camp Nou despite there being some reservations about his worload.In doing so, the La Masia graduate reach...",
+      "judge_label": "positive",
+      "candidate_labels": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "positive",
+        "google/gemini-2.5-flash": "positive",
+        "anthropic/claude-haiku-4-5": "positive",
+        "openai/gpt-4o-mini": "positive"
+      },
+      "candidate_reasons": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "The article highlights Lamine Yamal achieving a significant La Liga appearance record.",
+        "google/gemini-2.5-flash": "The article highlights Yamal's record-breaking achievement and 'sensation' status.",
+        "anthropic/claude-haiku-4-5": "Article highlights Yamal breaking records and surpassing Real Madrid legend.",
+        "openai/gpt-4o-mini": "Yamal's achievement highlights his talent and potential in La Liga."
+      }
+    },
+    {
+      "player": "Lamine Yamal",
+      "title": "Is Lamine Yamal playing? Confirmed lineups for Barcelona vs Espanyol in La Liga",
+      "description": "The stage is set for another intense Catalan derby, yet one lingering question continues to hover over the build-up: who will lead the charge when Barcelona returns to La Liga action? The stage is set for another intense Catalan derby, yet one lingering quest…",
+      "judge_label": "neutral",
+      "candidate_labels": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "neutral",
+        "google/gemini-2.5-flash": "neutral",
+        "anthropic/claude-haiku-4-5": "neutral",
+        "openai/gpt-4o-mini": "neutral"
+      },
+      "candidate_reasons": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "Article focuses on team lineups, not Yamal's performance.",
+        "google/gemini-2.5-flash": "The article mentions Lamine Yamal but doesn't provide sentiment about him.",
+        "anthropic/claude-haiku-4-5": "Article focuses on lineup confirmation, not Lamine Yamal specifically.",
+        "openai/gpt-4o-mini": "The article does not directly discuss Lamine Yamal's performance or status."
+      }
+    },
+    {
+      "player": "Lamine Yamal",
+      "title": "Official: Barcelona starting lineup against Espanyol – Gavi, Pedri in",
+      "description": "In a little over an hour, the Catalan derby between FC Barcelona and RCD Espanyol will kick off at the Spotify Camp Nou.Ahead of the crucial game, winning which could take them closer to the La Liga t...",
+      "judge_label": "neutral",
+      "candidate_labels": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "neutral",
+        "google/gemini-2.5-flash": "neutral",
+        "anthropic/claude-haiku-4-5": "neutral",
+        "openai/gpt-4o-mini": "neutral"
+      },
+      "candidate_reasons": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "Article mentions starting lineup but not Lamine Yamal specifically.",
+        "google/gemini-2.5-flash": "Lamine Yamal is not mentioned in the provided article.",
+        "anthropic/claude-haiku-4-5": "Article focuses on lineup announcement; Lamine Yamal not mentioned.",
+        "openai/gpt-4o-mini": "The article does not mention Lamine Yamal directly."
+      }
+    },
+    {
+      "player": "Lamine Yamal",
+      "title": "Gavi, Bardghji start in a 4-2-3-1 – How Barcelona can line up against Espanyol",
+      "description": "FC Barcelona will be aiming to bounce back to winning ways when they take on RCD Espanyol later today in La Liga.Having suffered a 0-2 loss to Atletico Madrid in the first leg of the UEFA Champions Le...",
+      "judge_label": "neutral",
+      "candidate_labels": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "neutral",
+        "google/gemini-2.5-flash": "neutral",
+        "anthropic/claude-haiku-4-5": "neutral",
+        "openai/gpt-4o-mini": "neutral"
+      },
+      "candidate_reasons": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "Article focuses on team lineup, not Lamine Yamal specifically.",
+        "google/gemini-2.5-flash": "The article does not mention Lamine Yamal, focusing on other players and the match.",
+        "anthropic/claude-haiku-4-5": "Article focuses on Barcelona's lineup and match preview, not Lamine Yamal.",
+        "openai/gpt-4o-mini": "The article does not mention Lamine Yamal directly."
+      }
+    },
+    {
+      "player": "Lamine Yamal",
+      "title": "Official: Barcelona squad list to face Espanyol – De Jong returns",
+      "description": "FC Barcelona lock horns with neighbours and arch-rivals RCD Espanyol later tonight in the Catalan derby in La Liga.Ahead of the big game at the Spotify Camp Nou, Barcelona manager Hansi Flick has anno...",
+      "judge_label": "neutral",
+      "candidate_labels": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "neutral",
+        "google/gemini-2.5-flash": "neutral",
+        "anthropic/claude-haiku-4-5": "neutral",
+        "openai/gpt-4o-mini": "neutral"
+      },
+      "candidate_reasons": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "Article focuses on squad list and upcoming match, not Yamal.",
+        "google/gemini-2.5-flash": "The article is about the Barcelona squad list and does not mention Lamine Yamal.",
+        "anthropic/claude-haiku-4-5": "Article focuses on squad list and De Jong's return, not Lamine Yamal specifically.",
+        "openai/gpt-4o-mini": "The article does not mention Lamine Yamal directly."
+      }
+    },
+    {
+      "player": "Lamine Yamal",
+      "title": "Barcelona superstar ‘OK’ for derby vs Espanyol after minor scare in training",
+      "description": "FC Barcelona lock horns with RCD Espanyol later today at the Spotify Camp Nou in La Liga, aiming to take a step closer to lifting the title.Leading up to the game, the Catalans have received a major b...",
+      "judge_label": "positive",
+      "candidate_labels": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "positive",
+        "google/gemini-2.5-flash": "neutral",
+        "anthropic/claude-haiku-4-5": "positive",
+        "openai/gpt-4o-mini": "neutral"
+      },
+      "candidate_reasons": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "Article indicates he is 'OK' for the upcoming derby match.",
+        "google/gemini-2.5-flash": "The article mentions a 'Barcelona superstar' but doesn't specify Lamine Yamal.",
+        "anthropic/claude-haiku-4-5": "Article indicates Yamal is fit and available for important derby match.",
+        "openai/gpt-4o-mini": "The article does not directly mention Lamine Yamal."
+      }
+    },
+    {
+      "player": "Ruben Dias",
+      "title": "Chelsea vs Manchester City: Premier League – team news, start, lineups",
+      "description": "Second-placed Manchester City travel to Chelsea as the Premier League title race approaches crunch time.",
+      "judge_label": "neutral",
+      "candidate_labels": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "neutral",
+        "google/gemini-2.5-flash": "neutral",
+        "anthropic/claude-haiku-4-5": "neutral",
+        "openai/gpt-4o-mini": "neutral"
+      },
+      "candidate_reasons": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "Article focuses on the match, not Ruben Dias specifically.",
+        "google/gemini-2.5-flash": "The article does not mention Ruben Dias, focusing on team news and the match.",
+        "anthropic/claude-haiku-4-5": "Article is about match preview, does not mention Ruben Dias specifically.",
+        "openai/gpt-4o-mini": "The article does not mention Ruben Dias directly."
+      }
+    },
+    {
+      "player": "Ruben Dias",
+      "title": "Bernardo Silva hasn’t told me he is leaving Manchester City, says Pep Guardiola",
+      "description": "Guardiola says he is ‘so grumpy” with Bernardo Silva for not yet telling him his future plansThe City manager had requested to be the first person informed when Silva reaches a decisionSilva is ex...",
+      "judge_label": "neutral",
+      "candidate_labels": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "neutral",
+        "google/gemini-2.5-flash": "neutral",
+        "anthropic/claude-haiku-4-5": "neutral",
+        "openai/gpt-4o-mini": "neutral"
+      },
+      "candidate_reasons": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "The article focuses on Bernardo Silva and Pep Guardiola, not Ruben Dias.",
+        "google/gemini-2.5-flash": "The article is about Bernardo Silva and Pep Guardiola, not Ruben Dias.",
+        "anthropic/claude-haiku-4-5": "Article focuses on Bernardo Silva, not Ruben Dias directly.",
+        "openai/gpt-4o-mini": "The article does not mention Ruben Dias directly."
+      }
+    },
+    {
+      "player": "Ruben Dias",
+      "title": "Chelsea vs Manchester City: Match preview, predicted line-ups, team news and prediction",
+      "description": "Chelsea welcome Manchester City to Stamford Bridge on Sunday afternoon in the Premier League’s matchday 32 biggest match-up.Chelsea lost 3-0 at Everton last time out, while City were held to a 1-1 d...",
+      "judge_label": "neutral",
+      "candidate_labels": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "neutral",
+        "google/gemini-2.5-flash": "neutral",
+        "anthropic/claude-haiku-4-5": "neutral",
+        "openai/gpt-4o-mini": "neutral"
+      },
+      "candidate_reasons": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "The article is a match preview and does not focus on Ruben Dias.",
+        "google/gemini-2.5-flash": "Ruben Dias is not mentioned in the provided article snippet.",
+        "anthropic/claude-haiku-4-5": "Article is a match preview with no specific mention of Ruben Dias.",
+        "openai/gpt-4o-mini": "The article does not mention Ruben Dias directly."
+      }
+    },
+    {
+      "player": "Ruben Dias",
+      "title": "How to buy Premier League tickets for Chelsea vs. Manchester City",
+      "description": "The Premier League title race and the battle for Champions League qualification collide this Sunday, April 12th, 2026, as Chelsea host Manchester City at",
+      "judge_label": "neutral",
+      "candidate_labels": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "neutral",
+        "google/gemini-2.5-flash": "neutral",
+        "anthropic/claude-haiku-4-5": "neutral",
+        "openai/gpt-4o-mini": "neutral"
+      },
+      "candidate_reasons": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "Article focuses on match details, not Ruben Dias's performance.",
+        "google/gemini-2.5-flash": "The article is about buying tickets, not about Ruben Dias.",
+        "anthropic/claude-haiku-4-5": "Article is about ticket purchasing, not about Ruben Dias specifically.",
+        "openai/gpt-4o-mini": "The article does not mention Ruben Dias directly."
+      }
+    },
+    {
+      "player": "Ruben Dias",
+      "title": "Chelsea v Manchester City: Line-ups-stats and preview",
+      "description": "Chelsea host Manchester City this weekend. Read our in-depth preview here...",
+      "judge_label": "neutral",
+      "candidate_labels": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "neutral",
+        "google/gemini-2.5-flash": "neutral",
+        "anthropic/claude-haiku-4-5": "neutral",
+        "openai/gpt-4o-mini": "neutral"
+      },
+      "candidate_reasons": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "Article is a general match preview, not focused on Dias.",
+        "google/gemini-2.5-flash": "The article is a general match preview and does not mention Ruben Dias.",
+        "anthropic/claude-haiku-4-5": "Article is a match preview with no specific mention of Ruben Dias.",
+        "openai/gpt-4o-mini": "The article does not mention Ruben Dias directly."
+      }
+    },
+    {
+      "player": "Ruben Dias",
+      "title": "Guardiola on team news, title race and Silva",
+      "description": "Manchester City boss Pep Guardiola has been speaking to the media before Sunday's Premier League game against Chelsea at Stamford Bridge (kick-off 16:30 BST). Guardiola confirmed Ruben Dias is \"getting better\" but will not be ready for Sunday. The City boss s…",
+      "judge_label": "neutral",
+      "candidate_labels": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "positive",
+        "google/gemini-2.5-flash": "neutral",
+        "anthropic/claude-haiku-4-5": "neutral",
+        "openai/gpt-4o-mini": "neutral"
+      },
+      "candidate_reasons": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "Guardiola stated Ruben Dias is 'getting better' from injury.",
+        "google/gemini-2.5-flash": "The article only mentions Dias's injury status, offering no sentiment.",
+        "anthropic/claude-haiku-4-5": "Article mentions Dias briefly regarding injury status without positive or negative commentary.",
+        "openai/gpt-4o-mini": "The article only mentions Dias' recovery status without further context."
+      }
+    },
+    {
+      "player": "Pedro Neto",
+      "title": "Chelsea vs Manchester City: Match preview, predicted line-ups, team news and prediction",
+      "description": "Chelsea welcome Manchester City to Stamford Bridge on Sunday afternoon in the Premier League’s matchday 32 biggest match-up.Chelsea lost 3-0 at Everton last time out, while City were held to a 1-1 d...",
+      "judge_label": "neutral",
+      "candidate_labels": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "neutral",
+        "google/gemini-2.5-flash": "neutral",
+        "anthropic/claude-haiku-4-5": "neutral",
+        "openai/gpt-4o-mini": "neutral"
+      },
+      "candidate_reasons": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "Article focuses on Chelsea vs Manchester City match preview.",
+        "google/gemini-2.5-flash": "Pedro Neto is not mentioned in the provided article snippet.",
+        "anthropic/claude-haiku-4-5": "Article is a match preview with no specific mention of Pedro Neto.",
+        "openai/gpt-4o-mini": "The article does not mention Pedro Neto directly."
+      }
+    },
+    {
+      "player": "Pedro Neto",
+      "title": "Cucurella And Caicedo To Start | 4-2-3-1 Chelsea Predicted Lineup Vs Manchester City",
+      "description": "Chelsea will entertain Manchester City at Stamford Bridge this Sunday as they look to secure a positive result at home in the Premier League. The Blues managed to secure a dominant 7-0 win over Port V...",
+      "judge_label": "neutral",
+      "candidate_labels": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "neutral",
+        "google/gemini-2.5-flash": "neutral",
+        "anthropic/claude-haiku-4-5": "neutral",
+        "openai/gpt-4o-mini": "neutral"
+      },
+      "candidate_reasons": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "The article focuses on Chelsea's predicted lineup, not Pedro Neto.",
+        "google/gemini-2.5-flash": "The article is about Chelsea's predicted lineup against Manchester City, not Pedro Neto.",
+        "anthropic/claude-haiku-4-5": "Article focuses on lineup prediction; Pedro Neto not mentioned directly.",
+        "openai/gpt-4o-mini": "The article does not mention Pedro Neto directly."
+      }
+    },
+    {
+      "player": "Pedro Neto",
+      "title": "“I know what I can do” – Chelsea’s disappointing signing promises his second year will be better",
+      "description": "Alejandro Garnacho has not had an amazing first season at Chelsea, but he insists the best is yet to come from him.If you enjoy Chelsea News coverage and want to see more of it, add us as a preferred ...",
+      "judge_label": "neutral",
+      "candidate_labels": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "neutral",
+        "google/gemini-2.5-flash": "neutral",
+        "anthropic/claude-haiku-4-5": "neutral",
+        "openai/gpt-4o-mini": "neutral"
+      },
+      "candidate_reasons": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "The article is about Alejandro Garnacho, not Pedro Neto.",
+        "google/gemini-2.5-flash": "The article is about Alejandro Garnacho, not Pedro Neto.",
+        "anthropic/claude-haiku-4-5": "Article is about Alejandro Garnacho, not Pedro Neto.",
+        "openai/gpt-4o-mini": "The article does not mention Pedro Neto directly."
+      }
+    },
+    {
+      "player": "Pedro Neto",
+      "title": "PREVIEW | Chelsea vs Manchester City - team news, lineups, predictions",
+      "description": "Chelsea and Manchester City clash this Sunday at the Stamford Bridge for round 32 of the Premier League. The match will be broadcast live at 16:30 on Sky Sports Main Event.Chelsea currently have 48 po...",
+      "judge_label": "neutral",
+      "candidate_labels": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "neutral",
+        "google/gemini-2.5-flash": "neutral",
+        "anthropic/claude-haiku-4-5": "neutral",
+        "openai/gpt-4o-mini": "neutral"
+      },
+      "candidate_reasons": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "The article is a preview for Chelsea vs Manchester City, not about Pedro Neto.",
+        "google/gemini-2.5-flash": "The article does not mention Pedro Neto at all.",
+        "anthropic/claude-haiku-4-5": "Article is a match preview with no specific mention of Pedro Neto.",
+        "openai/gpt-4o-mini": "The article does not mention Pedro Neto directly."
+      }
+    },
+    {
+      "player": "Pedro Neto",
+      "title": "“I expect” – Paul Merson delivers his Chelsea vs Manchester City prediction",
+      "description": "Chelsea host Manchester City at Stamford Bridge on Sunday and Paul Merson has given his prediction for the big game.DOWNLOAD THE OFFICIAL CHELSEA NEWS APP FOR ALL THE LATEST UPDATES – STRAIGHT TO YO...",
+      "judge_label": "neutral",
+      "candidate_labels": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "neutral",
+        "google/gemini-2.5-flash": "neutral",
+        "anthropic/claude-haiku-4-5": "neutral",
+        "openai/gpt-4o-mini": "neutral"
+      },
+      "candidate_reasons": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "The article is about a Chelsea vs Manchester City prediction.",
+        "google/gemini-2.5-flash": "The article is about Chelsea vs. Manchester City and Paul Merson's prediction, not Pedro Neto.",
+        "anthropic/claude-haiku-4-5": "Article is about Chelsea vs Manchester City prediction, not Pedro Neto.",
+        "openai/gpt-4o-mini": "The article does not mention Pedro Neto at all."
+      }
+    },
+    {
+      "player": "Pedro Neto",
+      "title": "Manchester City’s upcoming clash with Chelsea will likely shape their run home",
+      "description": "Manchester City return to Premier League action this weekend after a prolonged period with their focus lying elsewhere. Pep Guardiola’s side beat Arsenal in the Carabao Cup final just over three wee...",
+      "judge_label": "neutral",
+      "candidate_labels": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "neutral",
+        "google/gemini-2.5-flash": "neutral",
+        "anthropic/claude-haiku-4-5": "neutral",
+        "openai/gpt-4o-mini": "neutral"
+      },
+      "candidate_reasons": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "The article focuses on Manchester City and Chelsea, not Pedro Neto.",
+        "google/gemini-2.5-flash": "The article does not mention Pedro Neto.",
+        "anthropic/claude-haiku-4-5": "Article focuses on Manchester City vs Chelsea match, not Pedro Neto specifically.",
+        "openai/gpt-4o-mini": "The article does not mention Pedro Neto directly."
+      }
+    },
+    {
+      "player": "Joao Neves",
+      "title": "Dominant PSG beats Liverpool 2-0 in Champions League quarterfinal 1st leg",
+      "description": "Desire Doue and Khvicha Kvaratskhelia scored the goals to give a dominant Paris Saint-Germain a 2-0 win over Liverpool in their Champions League quarterfinal first leg on Wednesday, as the holders seized a clear advantage to take to Anfield for next week's re…",
+      "judge_label": "neutral",
+      "candidate_labels": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "neutral",
+        "google/gemini-2.5-flash": "neutral",
+        "anthropic/claude-haiku-4-5": "neutral",
+        "openai/gpt-4o-mini": "neutral"
+      },
+      "candidate_reasons": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "The article focuses on PSG's victory over Liverpool, not Joao Neves.",
+        "google/gemini-2.5-flash": "Joao Neves is not mentioned in the provided article.",
+        "anthropic/claude-haiku-4-5": "Article focuses on PSG's victory; Joao Neves not mentioned.",
+        "openai/gpt-4o-mini": "The article does not mention Joao Neves at all."
+      }
+    },
+    {
+      "player": "Joao Neves",
+      "title": "Player Ratings: Khvicha Kvaratskhelia shines as PSG beat Liverpool",
+      "description": "Paris Saint-Germain Take Firm Control Against Liverpool in Champions League Quarter FinalParis Saint-Germain delivered a controlled and convincing 2-0 victory over Liverpool in their Champions League ...",
+      "judge_label": "neutral",
+      "candidate_labels": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "neutral",
+        "google/gemini-2.5-flash": "neutral",
+        "anthropic/claude-haiku-4-5": "neutral",
+        "openai/gpt-4o-mini": "neutral"
+      },
+      "candidate_reasons": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "Article focuses on Kvaratskhelia and PSG vs Liverpool match.",
+        "google/gemini-2.5-flash": "The article does not mention Joao Neves at all.",
+        "anthropic/claude-haiku-4-5": "Article focuses on Kvaratskhelia and PSG's victory, not Joao Neves.",
+        "openai/gpt-4o-mini": "The article does not mention Joao Neves at all."
+      }
+    },
+    {
+      "player": "Joao Neves",
+      "title": "PSG in control as champions dominate Liverpool",
+      "description": "Désiré Doué and Khvicha Kvaratskhelia earn PSG home win at Parc des Princes",
+      "judge_label": "neutral",
+      "candidate_labels": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "neutral",
+        "google/gemini-2.5-flash": "neutral",
+        "anthropic/claude-haiku-4-5": "neutral",
+        "openai/gpt-4o-mini": "neutral"
+      },
+      "candidate_reasons": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "Article focuses on PSG's win and other players, not Joao Neves.",
+        "google/gemini-2.5-flash": "Joao Neves is not mentioned in the article's title or description.",
+        "anthropic/claude-haiku-4-5": "Article focuses on Doué and Kvaratskhelia; Neves not mentioned.",
+        "openai/gpt-4o-mini": "The article does not mention Joao Neves at all."
+      }
+    },
+    {
+      "player": "Joao Neves",
+      "title": "Liverpool suffer third defeat in succession as PSG outclass Reds in Champions League quarter-final first leg",
+      "description": "The good news for Liverpool is that they do not require their greatest Anfield comeback in Europe. But if that tag will forever be reserved for Barcelona in 2019, it may need their second best to eliminate Paris Saint-Germain.",
+      "judge_label": "neutral",
+      "candidate_labels": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "neutral",
+        "google/gemini-2.5-flash": "neutral",
+        "anthropic/claude-haiku-4-5": "neutral",
+        "openai/gpt-4o-mini": "neutral"
+      },
+      "candidate_reasons": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "The article focuses on Liverpool's defeat and PSG's performance.",
+        "google/gemini-2.5-flash": "The article does not mention Joao Neves at all.",
+        "anthropic/claude-haiku-4-5": "Article does not mention Joao Neves specifically.",
+        "openai/gpt-4o-mini": "The article does not mention Joao Neves directly."
+      }
+    },
+    {
+      "player": "Joao Neves",
+      "title": "Parisian pain for Liverpool as PSG take firm grip of tie",
+      "description": "Liverpool's Champions League hopes look bleak after Paris Saint-Germain ran out deserved 2-0 victors against Arne Slot's stumbling side in the quarter-final first leg in France.",
+      "judge_label": "neutral",
+      "candidate_labels": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "neutral",
+        "google/gemini-2.5-flash": "neutral",
+        "anthropic/claude-haiku-4-5": "neutral",
+        "openai/gpt-4o-mini": "neutral"
+      },
+      "candidate_reasons": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "The article focuses on PSG's victory over Liverpool, not Joao Neves.",
+        "google/gemini-2.5-flash": "The article does not mention Joao Neves at all.",
+        "anthropic/claude-haiku-4-5": "Article does not mention Joao Neves specifically.",
+        "openai/gpt-4o-mini": "The article does not mention Joao Neves directly."
+      }
+    },
+    {
+      "player": "Joao Neves",
+      "title": "Dominant PSG leave Liverpool right up against it in Champions League tie",
+      "description": "Desire Doue and Khvicha Kvaratskhelia scored the goals to give a dominant Paris Saint-Germain a 2-0 win over Liverpool in their Champions League quarter-final first leg on Wednesday, as the holders seized a clear advantage to take to Anfield for next week's r…",
+      "judge_label": "neutral",
+      "candidate_labels": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "neutral",
+        "google/gemini-2.5-flash": "neutral",
+        "anthropic/claude-haiku-4-5": "neutral",
+        "openai/gpt-4o-mini": "neutral"
+      },
+      "candidate_reasons": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "The article focuses on PSG's victory over Liverpool, not Joao Neves.",
+        "google/gemini-2.5-flash": "Joao Neves is not mentioned in the article.",
+        "anthropic/claude-haiku-4-5": "Article does not mention Joao Neves specifically.",
+        "openai/gpt-4o-mini": "The article does not mention Joao Neves at all."
+      }
+    },
+    {
+      "player": "Bradley Barcola",
+      "title": "Ligue 1 leader PSG rests while other teams chase a Champions League spot",
+      "description": "With Paris Saint-Germain given the weekend off to prepare for its trip to Liverpool in the Champions League, there will be no top-of-the-table clash against Lens this weekend. The French league controversially postponed the 1st vs. 2nd encounter following a r…",
+      "judge_label": "neutral",
+      "candidate_labels": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "neutral",
+        "google/gemini-2.5-flash": "neutral",
+        "anthropic/claude-haiku-4-5": "neutral",
+        "openai/gpt-4o-mini": "neutral"
+      },
+      "candidate_reasons": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "Article focuses on PSG team schedule, not Barcola.",
+        "google/gemini-2.5-flash": "Bradley Barcola is not mentioned in this article.",
+        "anthropic/claude-haiku-4-5": "Article focuses on PSG's schedule, not Bradley Barcola specifically.",
+        "openai/gpt-4o-mini": "The article does not mention Bradley Barcola directly."
+      }
+    },
+    {
+      "player": "Bradley Barcola",
+      "title": "Is Mohamed Salah playing today? Predicted lineups for PSG vs Liverpool in the 2025-26 Champions League Quarterfinals",
+      "description": "PSG and Liverpool are set to face off in the UEFA Champions League quarterfinals, arriving in contrasting forms. While the French side arrives as one of the best teams in the world, the Reds are in the midst of one of their worst seasons, making Mohamed Salah…",
+      "judge_label": "neutral",
+      "candidate_labels": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "neutral",
+        "google/gemini-2.5-flash": "neutral",
+        "anthropic/claude-haiku-4-5": "neutral",
+        "openai/gpt-4o-mini": "neutral"
+      },
+      "candidate_reasons": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "The article focuses on Salah and team form, not Barcola.",
+        "google/gemini-2.5-flash": "The article does not mention Bradley Barcola.",
+        "anthropic/claude-haiku-4-5": "Article does not mention Bradley Barcola directly.",
+        "openai/gpt-4o-mini": "The article does not mention Bradley Barcola directly."
+      }
+    },
+    {
+      "player": "Bradley Barcola",
+      "title": "PSG vs. Liverpool: Injury List, Suspensions & Predicted XIs",
+      "description": "PSG and Liverpool meet on Wednesday at the Parc des Princes in the first leg of the Champions League quarterfinals. A look at which players will be absent for the match and the possible lineups.",
+      "judge_label": "neutral",
+      "candidate_labels": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "neutral",
+        "google/gemini-2.5-flash": "neutral",
+        "anthropic/claude-haiku-4-5": "neutral",
+        "openai/gpt-4o-mini": "neutral"
+      },
+      "candidate_reasons": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "Article focuses on team news, not Barcola's performance.",
+        "google/gemini-2.5-flash": "The article is about team news for a match, not specifically Bradley Barcola.",
+        "anthropic/claude-haiku-4-5": "Article focuses on injury list and lineups, not Bradley Barcola specifically.",
+        "openai/gpt-4o-mini": "The article does not mention Bradley Barcola directly."
+      }
+    },
+    {
+      "player": "Bradley Barcola",
+      "title": "No favourites against Liverpool, insists Luis Enrique",
+      "description": "PSG coach Luis Enrique downplays favourites tag ahead of Champions League quarter-final against Liverpool, warning of a tough contest despite the English side's struggles.",
+      "judge_label": "neutral",
+      "candidate_labels": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "neutral",
+        "google/gemini-2.5-flash": "neutral",
+        "anthropic/claude-haiku-4-5": "neutral",
+        "openai/gpt-4o-mini": "neutral"
+      },
+      "candidate_reasons": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "The article focuses on Luis Enrique's comments about Liverpool.",
+        "google/gemini-2.5-flash": "The article does not mention Bradley Barcola.",
+        "anthropic/claude-haiku-4-5": "Article focuses on Luis Enrique's comments, not Bradley Barcola specifically.",
+        "openai/gpt-4o-mini": "The article does not mention Bradley Barcola directly."
+      }
+    },
+    {
+      "player": "Bradley Barcola",
+      "title": "Liverpool are Liverpool: PSG star plays down talk of Reds demise ahead of Champions League clash",
+      "description": "Liverpool face a daunting trip to Paris Saint-Germain tomorrow night",
+      "judge_label": "neutral",
+      "candidate_labels": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "neutral",
+        "google/gemini-2.5-flash": "neutral",
+        "anthropic/claude-haiku-4-5": "neutral",
+        "openai/gpt-4o-mini": "neutral"
+      },
+      "candidate_reasons": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "The article focuses on Liverpool and PSG generally, not Barcola.",
+        "google/gemini-2.5-flash": "The article is about Liverpool vs. PSG, not Bradley Barcola specifically.",
+        "anthropic/claude-haiku-4-5": "Article focuses on Liverpool and PSG match, not Bradley Barcola specifically.",
+        "openai/gpt-4o-mini": "The article does not directly discuss Bradley Barcola's performance or sentiment."
+      }
+    },
+    {
+      "player": "Bradley Barcola",
+      "title": "PSG wary of wounded Liverpool ahead of European showdown",
+      "description": "Paris Saint-Germain star Vitinha insisted his side remain very wary of the threat posed by Champions League quarter-final opponents Liverpool despite the Anfield club coming into the heavyweight tie in poor form.The tie is a repeat of the Champions League las…",
+      "judge_label": "neutral",
+      "candidate_labels": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "neutral",
+        "google/gemini-2.5-flash": "neutral",
+        "anthropic/claude-haiku-4-5": "neutral",
+        "openai/gpt-4o-mini": "neutral"
+      },
+      "candidate_reasons": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "Article focuses on PSG vs Liverpool and Vitinha, not Barcola.",
+        "google/gemini-2.5-flash": "The article does not mention Bradley Barcola, focusing on PSG vs. Liverpool.",
+        "anthropic/claude-haiku-4-5": "Article focuses on Vitinha and PSG's approach, not Bradley Barcola.",
+        "openai/gpt-4o-mini": "The article does not mention Bradley Barcola directly."
+      }
+    },
+    {
+      "player": "Vitinha",
+      "title": "FEATURE | Three things we learned as PSG secure first-leg advantage against Liverpool",
+      "description": "UEFA Champions League title holders Paris Saint-Germain were up against a familiar opponent as Liverpool travelled to the Parc des Princes for the first leg of their quarter-final. PSG had met them la...",
+      "judge_label": "neutral",
+      "candidate_labels": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "neutral",
+        "google/gemini-2.5-flash": "neutral",
+        "anthropic/claude-haiku-4-5": "neutral",
+        "openai/gpt-4o-mini": "neutral"
+      },
+      "candidate_reasons": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "Article focuses on PSG's team performance, not Vitinha.",
+        "google/gemini-2.5-flash": "The article does not mention Vitinha, so his sentiment cannot be determined.",
+        "anthropic/claude-haiku-4-5": "Article is about PSG vs Liverpool match, not specifically about Vitinha.",
+        "openai/gpt-4o-mini": "The article does not mention Vitinha directly."
+      }
+    },
+    {
+      "player": "Vitinha",
+      "title": "Player Ratings: Khvicha Kvaratskhelia shines as PSG beat Liverpool",
+      "description": "Paris Saint-Germain Take Firm Control Against Liverpool in Champions League Quarter FinalParis Saint-Germain delivered a controlled and convincing 2-0 victory over Liverpool in their Champions League ...",
+      "judge_label": "neutral",
+      "candidate_labels": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "neutral",
+        "google/gemini-2.5-flash": "neutral",
+        "anthropic/claude-haiku-4-5": "neutral",
+        "openai/gpt-4o-mini": "neutral"
+      },
+      "candidate_reasons": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "The article focuses on Kvaratskhelia and the team result, not Vitinha.",
+        "google/gemini-2.5-flash": "Vitinha is not mentioned in the provided article title or description.",
+        "anthropic/claude-haiku-4-5": "Article focuses on Kvaratskhelia and PSG's victory, not Vitinha specifically.",
+        "openai/gpt-4o-mini": "The article does not mention Vitinha directly."
+      }
+    },
+    {
+      "player": "Vitinha",
+      "title": "PSG in control as champions dominate Liverpool",
+      "description": "Désiré Doué and Khvicha Kvaratskhelia earn PSG home win at Parc des Princes",
+      "judge_label": "neutral",
+      "candidate_labels": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "neutral",
+        "google/gemini-2.5-flash": "neutral",
+        "anthropic/claude-haiku-4-5": "neutral",
+        "openai/gpt-4o-mini": "neutral"
+      },
+      "candidate_reasons": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "Article focuses on PSG team performance, not Vitinha specifically.",
+        "google/gemini-2.5-flash": "Vitinha is not mentioned in the provided title or description.",
+        "anthropic/claude-haiku-4-5": "Article focuses on Doué and Kvaratskhelia; Vitinha not mentioned directly.",
+        "openai/gpt-4o-mini": "The article does not mention Vitinha directly."
+      }
+    },
+    {
+      "player": "Vitinha",
+      "title": "FEATURE | Three things we learned as PSG secure first-leg advantage against Liverpool",
+      "description": "UEFA Champions League title holders Paris Saint-Germain were up against a familiar opponent as Liverpool travelled to the Parc des Princes for the first leg of their quarter-final. PSG had met them la...",
+      "judge_label": "neutral",
+      "candidate_labels": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "neutral",
+        "google/gemini-2.5-flash": "neutral",
+        "anthropic/claude-haiku-4-5": "neutral",
+        "openai/gpt-4o-mini": "neutral"
+      },
+      "candidate_reasons": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "Article focuses on PSG's team performance, not Vitinha.",
+        "google/gemini-2.5-flash": "The article does not mention Vitinha, so his sentiment cannot be determined.",
+        "anthropic/claude-haiku-4-5": "Article is about PSG vs Liverpool match, not specifically about Vitinha.",
+        "openai/gpt-4o-mini": "The article does not mention Vitinha directly."
+      }
+    },
+    {
+      "player": "Vitinha",
+      "title": "Is Mohamed Salah playing today? Predicted lineups for PSG vs Liverpool in the 2025-26 Champions League Quarterfinals",
+      "description": "PSG and Liverpool are set to face off in the UEFA Champions League quarterfinals, arriving in contrasting forms. While the French side arrives as one of the best teams in the world, the Reds are in the midst of one of their worst seasons, making Mohamed Salah…",
+      "judge_label": "neutral",
+      "candidate_labels": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "neutral",
+        "google/gemini-2.5-flash": "neutral",
+        "anthropic/claude-haiku-4-5": "neutral",
+        "openai/gpt-4o-mini": "neutral"
+      },
+      "candidate_reasons": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "The article focuses on Salah and team form, not Vitinha.",
+        "google/gemini-2.5-flash": "Vitinha is not mentioned in the provided article snippet.",
+        "anthropic/claude-haiku-4-5": "Article does not mention Vitinha or discuss him directly.",
+        "openai/gpt-4o-mini": "The article does not mention Vitinha directly."
+      }
+    },
+    {
+      "player": "Vitinha",
+      "title": "“He doesn’t want to play” – PSG camp rocked by internal dispute just hours before Liverpool clash",
+      "description": "Paris Saint-Germain have been rocked by an internal dispute in the hours leading up to their Champions League quarter-final first leg against Liverpool.PSG will be aiming to take another step towards ...",
+      "judge_label": "neutral",
+      "candidate_labels": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "neutral",
+        "google/gemini-2.5-flash": "neutral",
+        "anthropic/claude-haiku-4-5": "neutral",
+        "openai/gpt-4o-mini": "neutral"
+      },
+      "candidate_reasons": {
+        "google/gemini-2.5-flash-lite-preview-09-2025": "The article discusses a general PSG internal dispute, not Vitinha specifically.",
+        "google/gemini-2.5-flash": "The article mentions an internal dispute but does not name Vitinha.",
+        "anthropic/claude-haiku-4-5": "Article does not mention Vitinha directly or specifically.",
+        "openai/gpt-4o-mini": "The article does not mention Vitinha directly."
+      }
+    }
+  ]
+}

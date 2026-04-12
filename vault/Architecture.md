@@ -4,7 +4,7 @@
 
 Football Agent Intelligence System is a proactive intelligence layer for football agents managing player portfolios of 20–50 players. It replaces manual monitoring (Transfermarkt + Google News + Excel) with an automated pipeline that collects data, detects signals, and generates actionable weekly briefings per player.
 
-**Target user:** Football agent (e.g. Gestifute-style firm). Manages a portfolio of players. Needs to know — before it becomes urgent — about contract expiry windows, sentiment drops, and market value changes.
+**Target user:** Football agent (e.g. Football Agent Assistant-style firm). Manages a portfolio of players. Needs to know — before it becomes urgent — about contract expiry windows, sentiment drops, and market value changes.
 
 **Value vs competitors:** ATHLIVO and ScoutDecision are passive — they store and organize data. This system actively monitors, detects alerts, and generates LLM briefings with recommended actions. Neither competitor uses agentic AI or proactive alerting (verified as of 2026-04).
 
@@ -44,20 +44,22 @@ Football Agent Intelligence System is a proactive intelligence layer for footbal
 │    │ (alerts exist OR briefing explicitly requested)    │
 │    ▼                                                    │
 │  generate_briefings                                     │
-│  (@observe LangFuse, RAG context, Gemini Flash)         │
+│  (@observe LangFuse, RAG context, dual model)           │
 │    │                                                    │
 │    ▼                                                    │
-│  human_review  ◄── interrupt_before                     │
-│  (agent reviews alerts + briefings before any action)   │
+│  critique_briefings                                     │
+│  (Flash Lite scores each briefing 0–9, selects winner)  │
 │    │                                                    │
 │    ▼                                                    │
-│   END                                                   │
+│  should_retry ──── (both models failed, attempts < 2) ──► generate_briefings
+│    │                                                    │
+│    │ (pass OR max attempts reached)                     │
+│    ▼                                                    │
+│   END  (briefings available in dashboard)               │
 └─────────────────────────────────────────────────────────┘
 ```
 
-`should_generate` is a conditional edge function — not a node. It routes to `generate_briefings` or `END` based on state.
-
-The graph uses `interrupt_before=["human_review"]` — execution pauses before the human review node. The agent inspects briefings in the frontend, then resumes by invoking `app.invoke(None, config)`.
+`should_generate` and `should_retry` are conditional edge functions — not nodes. Briefings are written to state and available for async review in the frontend — no blocking interrupt.
 
 ---
 
@@ -95,7 +97,7 @@ All LLM calls route through OpenRouter. Cost and latency tracked per run via Lan
 
 ## Demo Mode
 
-The public demo serves pre-generated `data/demo_data.json` containing 10 Gestifute players with real scraped data. The `/api/generate` endpoint returns HTTP 403 with instructions to clone the repo and run with own API keys.
+The public demo serves pre-generated `data/demo_data.json` containing 10 Football Agent Assistant players with real scraped data. The `/api/generate` endpoint returns HTTP 403 with instructions to clone the repo and run with own API keys.
 
 This protects API keys and scraping budget while keeping a fully functional UI visible to recruiters. The demo data was generated from a live pipeline run on 2026-04-08.
 

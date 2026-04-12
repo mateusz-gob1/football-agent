@@ -41,6 +41,5 @@ class AgentState(TypedDict):
     results: list[PlayerResult]          # one entry per player after processing
     # reflection loop control
     briefing_attempts: int               # incremented each time generate_briefings runs
-    # human-in-the-loop
-    pending_briefings: list[str]         # formatted briefings waiting for review
-    human_approved: bool                 # set to True when agent approves
+    # briefings ready for async review in the dashboard
+    pending_briefings: list[str]         # formatted briefings displayed in frontend

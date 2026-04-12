@@ -142,7 +142,7 @@
 
 ## ADR-015: Portfolio expanded to 20 players, stats from Transfermarkt (season 25/26)
 
-**Decision:** Demo portfolio expanded from 10 to 20 Gestifute players. Stats sourced directly from Transfermarkt season 25/26 pages (screenshots → manual entry). Added `minutes` and `age` fields to the player data model.
+**Decision:** Demo portfolio expanded from 10 to 20 Football Agent Assistant players. Stats sourced directly from Transfermarkt season 25/26 pages (screenshots → manual entry). Added `minutes` and `age` fields to the player data model.
 
 **Why:** 10 players felt like a proof-of-concept; 20 is a realistic small agency portfolio. Season 25/26 stats are the most current available (API-Football free tier only covers up to 2024/25). Minutes played is a key metric for agents — differentiates starter vs. bench role at a glance.
 
@@ -151,6 +151,48 @@
 **Rating removed from UI:** API-Football ratings are from 2024/25 (last season) — showing them next to 25/26 stats would be misleading. Removed entirely pending a live data source.
 
 **Trade-off:** Manual data entry is not scalable. Acceptable for a demo; the production path is Transfermarkt scraping once Cloudflare is bypassed.
+
+---
+
+## ADR-017: Human-in-the-loop removed from graph
+
+**Decision:** Removed `interrupt_before=["human_review"]` and the `human_review` node from the LangGraph graph. Briefings are written to state and available in the dashboard for async review — no blocking interrupt.
+
+**Why:** The system outputs read-only intelligence reports, not irreversible actions. A blocking interrupt makes sense when an agent could send an email, trigger a transfer, or publish something — none of which this system does. Async delivery is better UX: run completes, briefings are ready whenever the agent logs in.
+
+**Interview answer:** *"I implemented HITL with `interrupt_before`, evaluated it in practice, and removed it. HITL is the right pattern when the agent takes irreversible actions. For a read-only briefing system it adds friction without safety value. The next iteration would reintroduce it if the system gains the ability to send emails or draft contract proposals."*
+
+---
+
+## ADR-018: Evaluation layer — LLM-as-judge for sentiment, RAGAS for RAG
+
+**Decision:** Two evaluation scripts in `evaluation/`:
+- `sentiment_eval.py` — LLM-as-judge: claude-sonnet-4-6 classifies articles independently (ground truth), four candidate models compared against it
+- `ragas_eval.py` — RAGAS faithfulness + answer_relevancy on 5 players, context = ChromaDB chunks + structured stats/contract strings
+
+**Why LLM-as-judge instead of manual labels:** Manual labeling of 50 articles is time-consuming and introduces annotator bias. LLM-as-judge is standard practice in the industry — a stronger model's classification serves as pseudo-ground-truth. Key requirement: judge must be clearly stronger than candidates (Sonnet 4.6 vs Flash Lite/Flash/Mini/Haiku).
+
+**Why hybrid context for RAGAS faithfulness:** The briefing prompt combines NewsAPI articles (via RAG) and structured data (Transfermarkt stats, contract). Evaluating faithfulness against articles only gave 0.32 — misleadingly low. Adding structured data as context strings raised it to 0.64, accurately reflecting what the model actually had available.
+
+**Results (2026-04-12):**
+- Sentiment: gemini-2.5-flash-lite 97.2% agreement (36 articles) → kept as production model
+- RAGAS faithfulness: 0.641 | answer_relevancy: 0.709 (5 players)
+
+---
+
+## ADR-019: Platform renamed to Football Agent Assistant
+
+**Decision:** Removed "Gestifute" (real company name) from the codebase. Platform brand: "Football Agent Assistant". Demo account: Jorge Mendes (name only), agency field: "Football Agent Assistant".
+
+**Why:** Using a real company name in a public demo creates unnecessary association. Platform name as demo agency name reinforces product identity.
+
+---
+
+## ADR-020: Article links in Media Coverage section
+
+**Decision:** Article titles in the Media Coverage module are clickable links (open in new tab) when a URL is available.
+
+**Why:** An agent seeing a red dot (negative sentiment) needs to read the actual article before acting. Without links the dashboard is a dead end. Minimal change (3 lines JS), high practical value.
 
 ---
 

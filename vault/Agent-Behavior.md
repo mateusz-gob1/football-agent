@@ -21,17 +21,21 @@ should_generate ──── (no alerts, no briefing requested) ────► 
   │ (alerts exist OR briefing explicitly requested)
   ▼
 generate_briefings
-  (@observe LangFuse, RAG context, Gemini Flash)
+  (@observe LangFuse, RAG context, Gemini Flash + Claude Sonnet parallel)
   │
   ▼
-human_review   ◄── interrupt_before=["human_review"]
-  (agent reviews briefings before any action)
+critique_briefings
+  (Flash Lite scores Flash and Sonnet briefings 0–9, selects winner)
   │
   ▼
-END
+should_retry ──── (both fail AND attempts < 2) ────► generate_briefings
+  │
+  │ (pass OR max attempts reached)
+  ▼
+END  (briefings written to state, available in dashboard)
 ```
 
-`should_generate` is a conditional edge function — not a standalone node. It reads state and routes to `generate_briefings` or `END`.
+`should_generate` and `should_retry` are conditional edge functions — not standalone nodes.
 
 ---
 
@@ -66,20 +70,29 @@ Returns `"generate_briefings"` if any player in state has alerts, or if a full b
 ### generate_briefings
 
 For each player with alerts (or all players if full run), builds a prompt with:
-- Season statistics (goals, assists, appearances, rating)
+- Season statistics (goals, assists, appearances, minutes)
 - Market value and contract data
 - RAG context: top 5 relevant articles retrieved from ChromaDB via `retrieve_context(player_name, k=5)`
 - Sentiment summary and alert list
 
-Model: `google/gemini-2.5-flash`
+Both models run in parallel: `google/gemini-2.5-flash` (Flash) and `anthropic/claude-sonnet-4-6` (Sonnet).
 
 LangFuse trace: `generate_briefings` (decorated with `@observe`)
 
-Writes briefing text into `PlayerResult.briefing`.
+Writes `briefing_flash` and `briefing_sonnet` into `PlayerResult`.
 
-### human_review
+### critique_briefings
 
-Interrupt node. LangGraph pauses execution here before this node runs. The agent reviews all generated briefings in the frontend or terminal, then resumes execution. No LLM call — pure human gate.
+Scores both briefings using `google/gemini-2.5-flash-lite`. Three criteria, each scored 1–3:
+- **ACTIONABLE** — does the briefing give the agent concrete next steps?
+- **GROUNDED** — are claims backed by data (stats, articles, contract info)?
+- **ALERT-AWARE** — are all detected alerts addressed?
+
+Max score: 9/9. Pass threshold: ≥7/9. The higher-scoring briefing is selected as `PlayerResult.briefing`. Scores and feedback stored in `PlayerResult.reflection`.
+
+### should_retry (conditional edge)
+
+If any player has both models failing (score < 7) AND `briefing_attempts < MAX_REFLECTION_ATTEMPTS` (2): routes back to `generate_briefings` with critique feedback injected into the prompt. Otherwise routes to `END`.
 
 ---
 
@@ -87,13 +100,13 @@ Interrupt node. LangGraph pauses execution here before this node runs. The agent
 
 ```python
 class AgentState(TypedDict):
-    players: list[dict]            # input: player dicts from player store
-    results: list[PlayerResult]    # output: one per player, populated by fetch_data
-    pending_briefings: list[str]   # briefing texts waiting for human review
-    human_approved: bool           # set to True after human_review resumes
+    players: list[dict]          # input: player dicts from player store
+    results: list[PlayerResult]  # output: one per player, populated by fetch_data
+    briefing_attempts: int       # incremented each time generate_briefings runs
+    pending_briefings: list[str] # formatted briefings displayed in frontend
 ```
 
-`PlayerResult` fields: `name`, `club`, `articles_count`, `sentiment`, `goals`, `assists`, `appearances`, `rating`, `market_value_eur`, `contract_expires`, `days_until_expiry`, `alerts`, `briefing`
+`PlayerResult` fields: `name`, `club`, `articles_count`, `sentiment_overall`, `sentiment_details`, `goals`, `assists`, `appearances`, `minutes`, `age`, `rating`, `league`, `market_value_eur`, `contract_expires`, `days_until_expiry`, `value_history`, `alerts`, `briefing_flash`, `briefing_sonnet`, `briefing`, `reflection`
 
 ---
 
@@ -107,7 +120,7 @@ from tools.player_store import load_players
 config = {"configurable": {"thread_id": "run-001"}}
 
 app.invoke(
-    {"players": [p.__dict__ for p in load_players()], "results": [], "pending_briefings": [], "human_approved": False},
+    {"players": [p.__dict__ for p in load_players()], "results": [], "pending_briefings": [], "briefing_attempts": 0},
     config=config
 )
 ```
@@ -115,35 +128,12 @@ app.invoke(
 **Single player run:**
 ```python
 app.invoke(
-    {"players": [mbappe.__dict__], "results": [], "pending_briefings": [], "human_approved": False},
+    {"players": [player.__dict__], "results": [], "pending_briefings": [], "briefing_attempts": 0},
     config=config
 )
 ```
 
-The graph is identical for both — the scope is controlled by what is passed in `players`.
-
----
-
-## Human-in-the-Loop
-
-The graph is compiled with `interrupt_before=["human_review"]`:
-
-```python
-app = graph.compile(
-    checkpointer=MemorySaver(),
-    interrupt_before=["human_review"]
-)
-```
-
-When execution reaches the `human_review` node, LangGraph serializes the full state to the checkpointer and pauses. The calling code receives control back and can inspect `state["pending_briefings"]`.
-
-To resume after the agent approves:
-
-```python
-app.invoke(None, config=config)
-```
-
-Passing `None` as input tells LangGraph to resume from the checkpoint using the existing state. Execution continues from `human_review` through to `END`.
+The graph is identical for both — scope is controlled by what is passed in `players`.
 
 ---
 

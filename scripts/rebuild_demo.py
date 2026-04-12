@@ -1,5 +1,5 @@
 """
-Rebuild demo_data.json with all 20 Gestifute players.
+Rebuild demo_data.json with the full 20-player demo portfolio.
 Uses real NewsAPI articles + generates briefings via Flash + Sonnet + critique.
 Stats from Transfermarkt screenshots (season 25/26).
 """
@@ -28,7 +28,7 @@ SNAPSHOT = date(2026, 4, 9)
 def days_until(expiry_str):
     return (date.fromisoformat(expiry_str) - SNAPSHOT).days
 
-# ── Full 20-player Gestifute portfolio ───────────────────────────────────────
+# ── Full 20-player demo portfolio ────────────────────────────────────────────
 PORTFOLIO = [
     {"name":"Lamine Yamal",        "club":"FC Barcelona",        "league":"La Liga",        "position":"Right Winger",      "nationality":"Spanish",    "age":18, "initials":"LY","color":"#0055a4","market_value_eur":200,"contract_expires":"2031-06-30","apps":42,"goals":21,"assists":16,"minutes":3477},
     {"name":"Vitinha",             "club":"Paris Saint-Germain", "league":"Ligue 1",         "position":"Defensive Midfield","nationality":"Portuguese", "age":26, "initials":"VI","color":"#004170","market_value_eur":110,"contract_expires":"2029-06-30","apps":43,"goals":7, "assists":10,"minutes":3529},
@@ -203,7 +203,7 @@ total_articles = sum(p["articles_count"] for p in players)
 total_value    = sum(p["market_value_eur"] for p in players)
 
 out = {
-    "agent": {"name":"Jorge Mendes","agency":"Gestifute","email":"jorge@gestifute.com"},
+    "agent": {"name":"Jorge Mendes","agency":"Football Agent Assistant","email":"jorge@footballagentassistant.com"},
     "system_info": {
         "last_run": "2026-04-09",
         "total_players": len(players),

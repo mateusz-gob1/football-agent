@@ -307,11 +307,21 @@ function showPlayer(index) {
   }
 }
 
+const BROKEN_URL_PATTERNS = ['consent.yahoo.com', 'consent.google.com', 'subscribe.', 'login.'];
+
+function isUsableUrl(url) {
+  if (!url) return false;
+  return !BROKEN_URL_PATTERNS.some(pattern => url.includes(pattern));
+}
+
 function buildArticleSources(articles) {
   if (!articles || articles.length === 0) return '';
   const items = articles.map(a => {
     const dot = `<span class="art-dot ${a.sentiment}"></span>`;
-    return `<div class="article-row">${dot}<span>${a.title}</span><span class="art-reason">${a.reason}</span></div>`;
+    const title = isUsableUrl(a.url)
+      ? `<a class="art-link" href="${a.url}" target="_blank" rel="noopener noreferrer">${a.title}</a>`
+      : `<span>${a.title}</span>`;
+    return `<div class="article-row">${dot}${title}<span class="art-reason">${a.reason}</span></div>`;
   }).join('');
   return `<div class="article-list">${items}</div>`;
 }

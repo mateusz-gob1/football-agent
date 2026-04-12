@@ -3,7 +3,7 @@ from langgraph.checkpoint.memory import MemorySaver
 from agents.state import AgentState
 from agents.nodes import (
     fetch_data, detect_alerts, generate_briefings,
-    critique_briefings, human_review,
+    critique_briefings,
     should_generate, should_retry,
 )
 
@@ -17,7 +17,6 @@ def build_graph():
     graph.add_node("detect_alerts", detect_alerts)
     graph.add_node("generate_briefings", generate_briefings)
     graph.add_node("critique_briefings", critique_briefings)
-    graph.add_node("human_review", human_review)
 
     graph.set_entry_point("fetch_data")
 
@@ -31,11 +30,10 @@ def build_graph():
     graph.add_conditional_edges(
         "critique_briefings",
         should_retry,
-        {"generate_briefings": "generate_briefings", "human_review": "human_review"},
+        {"generate_briefings": "generate_briefings", "end": END},
     )
-    graph.add_edge("human_review", END)
 
-    return graph.compile(checkpointer=checkpointer, interrupt_before=["human_review"])
+    return graph.compile(checkpointer=checkpointer)
 
 
 if __name__ == "__main__":
@@ -49,16 +47,8 @@ if __name__ == "__main__":
     print("Starting Football Agent...\n")
     print(f"Processing {len(players)} player(s): {', '.join(p['name'] for p in players)}\n")
 
-    # Run until interrupt
-    state = app.invoke({"players": players, "results": [], "pending_briefings": [], "briefing_attempts": 0, "human_approved": False}, config=config)
-
-    # Show briefings and ask for approval
-    print("\nBriefings ready. Type 'approve' to confirm or 'reject' to cancel: ", end="")
-    answer = input().strip().lower()
-
-    if answer == "approve":
-        # Resume graph after human_review
-        final = app.invoke(None, config=config)
-        print("\nBriefings approved. Run complete.")
-    else:
-        print("\nRun cancelled by agent.")
+    state = app.invoke(
+        {"players": players, "results": [], "pending_briefings": [], "briefing_attempts": 0},
+        config=config,
+    )
+    print("\nRun complete. Briefings ready for review.")

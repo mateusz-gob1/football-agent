@@ -1,5 +1,5 @@
 """
-Fetch real season stats for all Gestifute demo players.
+Fetch real season stats for all demo portfolio players.
 Uses known league IDs, one request per player, 7s delay between calls.
 Results go directly into data/demo_data.json.
 """
