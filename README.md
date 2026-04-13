@@ -127,6 +127,23 @@ All metrics measured — not estimated.
 
 ---
 
+## Limitations & Production Considerations
+
+The current system is a working proof-of-concept. Moving to production would require addressing a few known gaps:
+
+**Data layer**
+- The Transfermarkt scraper is fragile — Cloudflare Turnstile blocks requests under heavy load, and scraping structure can break with site updates. A production deployment would replace it with a licensed football data API (e.g. [API-Football](https://www.api-football.com/), [SportRadar](https://developer.sportradar.com/), or [StatsBomb](https://statsbomb.com/)) for reliable market values, contract data, and match statistics.
+- NewsAPI free tier limits results to 100 articles/day and 1-month history. A production tier or alternative source (e.g. GDELT, licensed press feeds) would be needed for comprehensive coverage.
+
+**Agent reliability**
+- Transfermarkt rate limiting (~10 requests per 5 min) means large portfolios run slowly. A proper API removes this constraint entirely.
+- The reflection loop retries up to 2 times — sufficient for demo, but production would benefit from more granular failure handling per data source.
+
+**Infrastructure**
+- The demo runs on pre-generated data. A production system would need a scheduler (e.g. weekly cron), persistent storage for history, and user authentication.
+
+---
+
 ## Tech Stack
 
 | Technology | Role |
