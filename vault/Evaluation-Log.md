@@ -137,10 +137,27 @@ Fixed 2026-04-09: articles now embedded into ChromaDB via `store_articles()`, co
 | Latency p50 (sentiment) | 2.40s | LangFuse dashboard |
 | Total cost (3 players, full run) | ~$0.002 | estimated |
 | Cost (10 players, 96 articles) | ~$0.006 | estimated, demo run |
-| Cost (20 players, 128 articles, dual briefing) | ~$0.024 | estimated (3× briefing stage vs single model) |
+| Cost (20 players, 128 articles, dual briefing) | ~$0.024 | LangFuse — full run estimate |
 | Sentiment accuracy (LLM-as-judge, 36 articles) | 97.2% | gemini-2.5-flash-lite vs claude-sonnet-4-6 judge |
-| RAG faithfulness (RAGAS, 5 players) | 0.323 | briefings extend beyond articles — by design |
-| RAG answer relevancy (RAGAS, 5 players) | 0.707 | briefings address monitoring query |
+| RAG faithfulness (RAGAS, 5 players) | 0.641 | hybrid context (articles + structured data) |
+| RAG answer relevancy (RAGAS, 5 players) | 0.709 | briefings address monitoring query |
+
+## LangFuse Summary (2026-04-13)
+
+Total traces tracked: **504**
+Total LLM cost: **$1.057**
+
+| Model | Tokens | Cost |
+|---|---|---|
+| anthropic/claude-sonnet-4.6 | 66.73K | $0.4602 |
+| google/gemini-2.5-flash | 111K | $0.0904 |
+| google/gemini-2.5-flash-lite | 259.93K | $0.0457 |
+
+Trace breakdown:
+- OpenRouter traces: 252
+- OpenAI-compatible traces: 214
+- sentiment_analysis: 35
+- detect_signals: 3
 
 ---
 
