@@ -32,7 +32,7 @@ should_retry ──── (both fail AND attempts < 2) ────► generate_
   │
   │ (pass OR max attempts reached)
   ▼
-END  (briefings written to state, available in dashboard)
+END  (best briefing selected, results available in dashboard)
 ```
 
 `should_generate` and `should_retry` are conditional edge functions — not standalone nodes.
@@ -92,7 +92,7 @@ Max score: 9/9. Pass threshold: ≥7/9. The higher-scoring briefing is selected 
 
 ### should_retry (conditional edge)
 
-If any player has both models failing (score < 7) AND `briefing_attempts < MAX_REFLECTION_ATTEMPTS` (2): routes back to `generate_briefings` with critique feedback injected into the prompt. Otherwise routes to `END`.
+If any player has both models failing (score < 7) AND `briefing_attempts < MAX_REFLECTION_ATTEMPTS` (2): routes back to `generate_briefings` with critique feedback injected into the prompt. Otherwise routes to `"end"` → END.
 
 ---
 
