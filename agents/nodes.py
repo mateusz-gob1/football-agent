@@ -321,14 +321,14 @@ def should_retry(state: AgentState) -> str:
     Retry generation if any player failed both models AND we haven't hit the attempt limit.
     """
     if state.get("briefing_attempts", 0) >= MAX_REFLECTION_ATTEMPTS:
-        return "human_review"
+        return "end"
 
     for r in state["results"]:
         ref = r.get("reflection", {}) or {}
         if not ref.get("flash_passed") and not ref.get("sonnet_passed"):
             return "generate_briefings"
 
-    return "human_review"
+    return "end"
 
 
 def should_generate(state: AgentState) -> str:
